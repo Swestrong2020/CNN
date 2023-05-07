@@ -20,6 +20,7 @@ void AddNetworkLayer(Network *network, unsigned int neuronAmount)
         return;
     }
 
+    // Actually allocate the layer and its data
     network->layers = realloc(network->layers, (network->layerAmount + 1) * sizeof(Layer));
     if (network->layers == NULL)
     {
@@ -34,6 +35,7 @@ void AddNetworkLayer(Network *network, unsigned int neuronAmount)
     CurrentLayer->neurons = malloc(sizeof(Neuron) * neuronAmount);
     CurrentLayer->neuronAmount = neuronAmount;
 
+    // Allocate the weights and biases for the neuron (if there is a previous layer to have those values for)
     if (network->layerAmount > 1)
     {
         unsigned int PreviousLayerNeuronAmount = network->layers[network->layerAmount - 2].neuronAmount;
@@ -45,7 +47,14 @@ void AddNetworkLayer(Network *network, unsigned int neuronAmount)
 
             CurrentLayer->neurons[i].weights = malloc(sizeof(float) * PreviousLayerNeuronAmount);
             memset(CurrentLayer->neurons[i].weights, 0, sizeof(float) * PreviousLayerNeuronAmount);
+
+            CurrentLayer->neurons[i].output = 0.0f;
         }
     }
+}
+
+void RandomizeNetwork(Network *network)
+{
+
 }
 

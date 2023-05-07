@@ -1,13 +1,14 @@
-// #include "raylib.h"
-// #include "raymath.h"
-
 #include <stdio.h>
+
+#include "network.h"
+#include "types.h"
 
 int main(void)
 {
+    Network network;
 
+    InitNetwork(&network);
 
 
     return 0;
 }
-// gcc src/*.c -O  -std=c99 -I include -L lib -l raylib -Wall -Wextra -Wpedantic

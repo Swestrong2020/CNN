@@ -1,0 +1,7 @@
+
+
+typedef struct Network
+{
+    
+} Network;
+

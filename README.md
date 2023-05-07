@@ -1,2 +1,2 @@
 # CNN
-A neural network framework for c
+A neural network framework for C

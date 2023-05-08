@@ -55,7 +55,13 @@ void AddNetworkLayer(Network *network, unsigned int neuronAmount)
 
 void RandomizeNetwork(Network *network)
 {
-
+  for (unsigned int i = 1; i < network.layerAmount; i++)
+    for (unsigned int j = 0; j < network.layers[i].neuronAmount; j++)
+      for (unsigned int k = 0; k < network.layers[i - 1].neuronAmount; k++)
+      {
+        network.layers[i].neurons[j].weights[k] = 0.0f;
+        network.layers[i].neurons[j].biases[k]  = 0.0f;
+      }
 }
 
 void SetNetworkInput(Network *network, float *data, unsigned int dataAmount)

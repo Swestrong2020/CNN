@@ -39,12 +39,11 @@ int main(void)
 
     for (unsigned int i = 0; i < network.layers[network.layerAmount - 1].neuronAmount; i++)
     {
-      if (network.layers[network.layerAmount - 1].neurons[i].output > LargestWeight)
-      {
-        LargestWeight = network.layers[network.layerAmount - 1].neurons[i].output;
-        LargestWeightValue = i;
-
-      }
+        if (network.layers[network.layerAmount - 1].neurons[i].output > LargestWeight)
+        {
+            LargestWeight = network.layers[network.layerAmount - 1].neurons[i].output;
+            LargestWeightValue = i;
+        }
     }
 
     printf("Output value: %u\n", LargestWeightValue);

@@ -3,6 +3,8 @@
 #include <stdlib.h>
 #include <string.h>
 #include <stdio.h>
+#include <time.h>
+#include <math.h>
 
 #include "types.h"
 
@@ -12,7 +14,7 @@ void InitNetwork(Network *network)
     network->layerAmount = 0;
 }
 
-void AddNetworkLayer(Network *network, unsigned int neuronAmount)
+void AddNetworkLayer(Network *network, unsigned int neuronAmount, ActivationFunction activationFunction)
 {
     if (neuronAmount == 0)
     {
@@ -35,6 +37,8 @@ void AddNetworkLayer(Network *network, unsigned int neuronAmount)
     CurrentLayer->neurons = malloc(sizeof(Neuron) * neuronAmount);
     CurrentLayer->neuronAmount = neuronAmount;
 
+    CurrentLayer->activationFunction = activationFunction;
+
     // Allocate the weights and biases for the neuron (if there is a previous layer to have those values for)
     if (network->layerAmount > 1)
     {
@@ -55,12 +59,15 @@ void AddNetworkLayer(Network *network, unsigned int neuronAmount)
 
 void RandomizeNetwork(Network *network)
 {
+    srand(time(NULL));
 
-}
-
-void SetNetworkInput(Network *network, float *data, unsigned int dataAmount)
-{
-
+    for (unsigned int i = 1; i < network->layerAmount; i++)
+        for (unsigned int j = 0; j < network->layers[i].neuronAmount; j++)
+            for (unsigned int k = 0; k < network->layers[i - 1].neuronAmount; k++)
+            {
+                network->layers[i].neurons[j].weights[k] = ((float)rand() / (float)RAND_MAX) * 2.0f - 1.0f;
+                network->layers[i].neurons[j].biases[k]  = ((float)rand() / (float)RAND_MAX) * 2.0f - 1.0f;
+            }
 }
 
 void ExucuteNetwork(Network *network)
@@ -82,19 +89,35 @@ void ExucuteNetwork(Network *network)
             float Input = 0.0f;
 
             for (unsigned int k = 0; k < PreviousLayer->neuronAmount; k++)
-                Input += PreviousLayer->neurons[k].output * CurrentLayer->neurons[j].biases[k] + CurrentLayer->neurons[j].weights[k];
+                Input += PreviousLayer->neurons[k].output * CurrentLayer->neurons[j].weights[k] + CurrentLayer->neurons[j].biases[k];
             
-            // The activation function ReLU(Rectified liniar)
-            if (Input > 0.0f)
+            // The activation function ReLU (Rectified linear)
+            switch (CurrentLayer->activationFunction)
+            {
+            case ACTIVATION_FUNCTION_RELU:
+                if (Input > 0.0f)
+                    CurrentLayer->neurons[j].output = Input;
+                else
+                    CurrentLayer->neurons[j].output = 0.0f;
+                break;
+
+            case ACTIVATION_FUNCTION_SOFTMAX:
+                // unimplemented
+                break;
+
+            case ACTIVATION_FUNCTION_SIGMOID:
+                CurrentLayer->neurons[j].output = 1.0f / (1.0f + e)
+                break;
+
+            case ACTIVATION_FUNCTION_TANH:
+                CurrentLayer->neurons[j].output = tanh(Input) * 0.5f + 0.5f;
+                break;
+
+            default:
+                puts("OH GOD YOU HAVE NO ACTIVATION FUNCTION WHAT HAVE YOU DONE");
                 CurrentLayer->neurons[j].output = Input;
-            else
-                CurrentLayer->neurons[j].output = 0.0f;
+                break;
+            }
         }
     }
 }
-
-// void LoadNetwork(Network *network, char location )
-// {
-    
-// } 
-

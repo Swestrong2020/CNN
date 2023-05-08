@@ -4,12 +4,9 @@
 #include "types.h"
 
 void InitNetwork(Network *network);
-void AddNetworkLayer(Network *network, unsigned int neuronAmount);
+void AddNetworkLayer(Network *network, unsigned int neuronAmount, ActivationFunction activationFunction);
 void RandomizeNetwork(Network *network);
 
-void SetNetworkInput(Network *network, float *data, unsigned int dataAmount);
 void ExucuteNetwork(Network *network);
-
-// void LoadNetwork(Network *network);
 
 #endif // NETWORK_H

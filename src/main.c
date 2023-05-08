@@ -80,7 +80,7 @@ int main(void)
 
         putchar('\n');
     }
-return 0;
+
     // Example network
     SW_Network network;
 
@@ -91,10 +91,8 @@ return 0;
     SW_AddNetworkLayer(&network, 10, SW_ACTIVATION_FUNCTION_SIGMOID);
 
     SW_RandomizeNetwork(&network);
-    network.layers[0].neurons[0].output = 0.9f;
-    network.layers[0].neurons[3].output = 0.8f;
-    network.layers[0].neurons[7].output = 0.6f;
-    network.layers[0].neurons[8].output = 0.5f;
+    
+    SW_SetNetworkInput(&network, ImageData[0], 28 * 28);
 
     SW_ExucuteNetwork(&network);
 

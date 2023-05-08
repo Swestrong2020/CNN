@@ -1,26 +1,25 @@
 #include <stdio.h>
 
-#include "network.h"
-#include "types.h"
+#include "Swan/Swan.h"
 
 int main(void)
 {
     // Example network
-    Network network;
+    SW_Network network;
 
-    InitNetwork(&network);
-    AddNetworkLayer(&network, 28 * 28, ACTIVATION_FUNCTION_RELU);
-    AddNetworkLayer(&network, 32, ACTIVATION_FUNCTION_RELU);
-    AddNetworkLayer(&network, 32, ACTIVATION_FUNCTION_RELU);
-    AddNetworkLayer(&network, 10, ACTIVATION_FUNCTION_SIGMOID);
+    SW_InitNetwork(&network);
+    SW_AddNetworkLayer(&network, 28 * 28, SW_ACTIVATION_FUNCTION_RELU);
+    SW_AddNetworkLayer(&network, 32, SW_ACTIVATION_FUNCTION_RELU);
+    SW_AddNetworkLayer(&network, 32, SW_ACTIVATION_FUNCTION_RELU);
+    SW_AddNetworkLayer(&network, 10, SW_ACTIVATION_FUNCTION_SIGMOID);
 
-    RandomizeNetwork(&network);
+    SW_RandomizeNetwork(&network);
     network.layers[0].neurons[0].output = 0.9f;
     network.layers[0].neurons[3].output = 0.8f;
     network.layers[0].neurons[7].output = 0.6f;
     network.layers[0].neurons[8].output = 0.5f;
 
-    ExucuteNetwork(&network);
+    SW_ExucuteNetwork(&network);
 
     // Debugging output
     for (unsigned int i = 0; i < network.layerAmount; i++)

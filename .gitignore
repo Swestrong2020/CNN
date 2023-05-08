@@ -1,8 +1,6 @@
 #executeble 
 
-<<<<<<< HEAD
-*.ezec
+
 *.code-workspace
-=======
 *.exec
->>>>>>> 24f3e2d804b523a94ecb8907d7e0706ae450490f
+

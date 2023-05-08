@@ -70,11 +70,6 @@ void RandomizeNetwork(Network *network)
             }
 }
 
-void SetNetworkInput(Network *network, float *data, unsigned int dataAmoun)
-{
-// unimplemented
-}
-
 void ExucuteNetwork(Network *network)
 {
     if (network->layerAmount <= 2)
@@ -132,3 +127,4 @@ float LossCalc(Network *network)
 {
     
 }
+

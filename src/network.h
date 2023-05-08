@@ -6,7 +6,7 @@
 void InitNetwork(Network *network);
 void AddNetworkLayer(Network *network, unsigned int neuronAmount, ActivationFunction activationFunction);
 void RandomizeNetwork(Network *network);
-float LossCalc(Net)
+// float LossCalc(Net)
 
 void ExucuteNetwork(Network *network);
 

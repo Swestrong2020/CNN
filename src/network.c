@@ -59,12 +59,12 @@ void AddNetworkLayer(Network *network, unsigned int neuronAmount, ActivationFunc
 
 void RandomizeNetwork(Network *network)
 {
-  for (unsigned int i = 1; i < network.layerAmount; i++)
-    for (unsigned int j = 0; j < network.layers[i].neuronAmount; j++)
-      for (unsigned int k = 0; k < network.layers[i - 1].neuronAmount; k++)
+  for (unsigned int i = 1; i < network->layerAmount; i++)
+    for (unsigned int j = 0; j < network->layers[i].neuronAmount; j++)
+      for (unsigned int k = 0; k < network->layers[i - 1].neuronAmount; k++)
       {
-        network.layers[i].neurons[j].weights[k] = 0.0f;
-        network.layers[i].neurons[j].biases[k]  = 0.0f;
+        network->layers[i].neurons[j].weights[k] = 0.0f;
+        network->layers[i].neurons[j].biases[k]  = 0.0f;
       }
 }
 
@@ -117,7 +117,7 @@ void ExucuteNetwork(Network *network)
                 break;
 
             case ACTIVATION_FUNCTION_SIGMOID:
-                CurrentLayer->neurons[j].output = 1.0f / (1.0f + expf(-Input):);
+                CurrentLayer->neurons[j].output = 1.0f / (1.0f + expf(-Input));
                 break;
 
             case ACTIVATION_FUNCTION_TANH:

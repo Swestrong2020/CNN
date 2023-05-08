@@ -1,4 +1,4 @@
-#include "network.h"
+#include "SW_network.h"
 
 #include <stdlib.h>
 #include <string.h>
@@ -6,15 +6,15 @@
 #include <time.h>
 #include <math.h>
 
-#include "types.h"
+#include "SW_types.h"
 
-void InitNetwork(Network *network)
+void SW_InitNetwork(SW_Network *network)
 {
     network->layers = malloc(0);
     network->layerAmount = 0;
 }
 
-void AddNetworkLayer(Network *network, unsigned int neuronAmount, ActivationFunction activationFunction)
+void SW_AddNetworkLayer(SW_Network *network, unsigned int neuronAmount, SW_ActivationFunction activationFunction)
 {
     if (neuronAmount == 0)
     {
@@ -23,7 +23,7 @@ void AddNetworkLayer(Network *network, unsigned int neuronAmount, ActivationFunc
     }
 
     // Actually allocate the layer and its data
-    network->layers = realloc(network->layers, (network->layerAmount + 1) * sizeof(Layer));
+    network->layers = realloc(network->layers, (network->layerAmount + 1) * sizeof(SW_Layer));
     if (network->layers == NULL)
     {
         fputs("OH GOD OH CRAP EVERYTHING IS GOING WRONG", stderr);
@@ -32,9 +32,9 @@ void AddNetworkLayer(Network *network, unsigned int neuronAmount, ActivationFunc
 
     network->layerAmount++;
 
-    Layer *CurrentLayer = &network->layers[network->layerAmount - 1];
+    SW_Layer *CurrentLayer = &network->layers[network->layerAmount - 1];
 
-    CurrentLayer->neurons = malloc(sizeof(Neuron) * neuronAmount);
+    CurrentLayer->neurons = malloc(sizeof(SW_Neuron) * neuronAmount);
     CurrentLayer->neuronAmount = neuronAmount;
 
     CurrentLayer->activationFunction = activationFunction;
@@ -57,8 +57,9 @@ void AddNetworkLayer(Network *network, unsigned int neuronAmount, ActivationFunc
     }
 }
 
-void RandomizeNetwork(Network *network)
+void SW_RandomizeNetwork(SW_Network *network)
 {
+    // Randomize all the weights and biases for each connection
     srand(time(NULL));
 
     for (unsigned int i = 1; i < network->layerAmount; i++)
@@ -70,12 +71,7 @@ void RandomizeNetwork(Network *network)
             }
 }
 
-void SetNetworkInput(Network *network, float *data, unsigned int dataAmoun)
-{
-// unimplemented
-}
-
-void ExucuteNetwork(Network *network)
+void SW_ExucuteNetwork(SW_Network *network)
 {
     if (network->layerAmount <= 2)
     {
@@ -86,8 +82,8 @@ void ExucuteNetwork(Network *network)
     // Calculate the output for each neuron in each layer
     for (unsigned int i = 1; i < network->layerAmount; i++)
     {
-        Layer *PreviousLayer = &network->layers[i - 1];
-        Layer *CurrentLayer = &network->layers[i];
+        SW_Layer *PreviousLayer = &network->layers[i - 1];
+        SW_Layer *CurrentLayer = &network->layers[i];
 
         for (unsigned int j = 0; j < CurrentLayer->neuronAmount; j++)
         {
@@ -99,22 +95,22 @@ void ExucuteNetwork(Network *network)
             // The activation function ReLU (Rectified linear)
             switch (CurrentLayer->activationFunction)
             {
-            case ACTIVATION_FUNCTION_RELU:
+            case SW_ACTIVATION_FUNCTION_RELU:
                 if (Input > 0.0f)
                     CurrentLayer->neurons[j].output = Input;
                 else
                     CurrentLayer->neurons[j].output = 0.0f;
                 break;
 
-            case ACTIVATION_FUNCTION_SOFTMAX:
+            case SW_ACTIVATION_FUNCTION_SOFTMAX:
                 // unimplemented
                 break;
 
-            case ACTIVATION_FUNCTION_SIGMOID:
+            case SW_ACTIVATION_FUNCTION_SIGMOID:
                 CurrentLayer->neurons[j].output = 1.0f / (1.0f + expf(-Input));
                 break;
 
-            case ACTIVATION_FUNCTION_TANH:
+            case SW_ACTIVATION_FUNCTION_TANH:
                 CurrentLayer->neurons[j].output = tanh(Input) * 0.5f + 0.5f;
                 break;
 
@@ -128,7 +124,8 @@ void ExucuteNetwork(Network *network)
 }
 
 
-float LossCalc(Network *network)
+float SW_LossCalc(SW_Network *network)
 {
     
 }
+

@@ -4,4 +4,4 @@
 *.code-workspace
 *.exec
 
-.vscode
+.vscode/

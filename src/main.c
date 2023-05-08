@@ -9,10 +9,10 @@ int main(void)
     Network network;
 
     InitNetwork(&network);
-    AddNetworkLayer(&network, 16, ACTIVATION_FUNCTION_RELU);
-    AddNetworkLayer(&network, 8, ACTIVATION_FUNCTION_RELU);
-    AddNetworkLayer(&network, 8, ACTIVATION_FUNCTION_RELU);
-    AddNetworkLayer(&network, 2, ACTIVATION_FUNCTION_SIGMOID);
+    AddNetworkLayer(&network, 24, ACTIVATION_FUNCTION_RELU);
+    AddNetworkLayer(&network, 32, ACTIVATION_FUNCTION_RELU);
+    AddNetworkLayer(&network, 32, ACTIVATION_FUNCTION_RELU);
+    AddNetworkLayer(&network, 10, ACTIVATION_FUNCTION_SIGMOID);
 
     RandomizeNetwork(&network);
     network.layers[0].neurons[0].output = 0.9f;
@@ -32,6 +32,22 @@ int main(void)
 
         putchar('\n');
     }
+
+    // Find which neuron was the strongest on the last layer
+    float LargestWeight = -1.0f;
+    unsigned int LargestWeightValue;
+
+    for (unsigned int i = 0; i < network.layers[network.layerAmount - 1].neuronAmount; i++)
+    {
+      if (network.layers[network.layerAmount - 1].neurons[i].output > LargestWeight)
+      {
+        LargestWeight = network.layers[network.layerAmount - 1].neurons[i].output;
+        LargestWeightValue = i;
+
+      }
+    }
+
+    printf("Output value: %u\n", LargestWeightValue);
 
     return 0;
 }

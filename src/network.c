@@ -128,3 +128,7 @@ void ExucuteNetwork(Network *network)
 }
 
 
+float LossCalc(Network *network)
+{
+    
+}

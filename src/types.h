@@ -9,11 +9,21 @@ typedef struct Neuron
     float output;   // Its output
 } Neuron;
 
+typedef enum ActivationFunction
+{
+    ACTIVATION_FUNCTION_RELU = 0,
+    ACTIVATION_FUNCTION_SOFTMAX,
+    ACTIVATION_FUNCTION_SIGMOID,
+    ACTIVATION_FUNCTION_TANH
+} ActivationFunction;
+
 typedef struct Layer
 {
     Neuron *neurons;
 
     unsigned int neuronAmount;
+
+    ActivationFunction activationFunction;
 } Layer;
 
 typedef struct Network

@@ -58,3 +58,43 @@ void RandomizeNetwork(Network *network)
 
 }
 
+void SetNetworkInput(Network *network, float *data, unsigned int dataAmount)
+{
+
+}
+
+void ExucuteNetwork(Network *network)
+{
+    if (network->layerAmount <= 2)
+    {
+        fputs("You can't execute a network without any layers, stupid", stderr);
+        return;
+    }
+
+    // Calculate the output for each neuron in each layer
+    for (unsigned int i = 1; i < network->layerAmount; i++)
+    {
+        Layer *PreviousLayer = &network->layers[i - 1];
+        Layer *CurrentLayer = &network->layers[i];
+
+        for (unsigned int j = 0; j < CurrentLayer->neuronAmount; j++)
+        {
+            float Input = 0.0f;
+
+            for (unsigned int k = 0; k < PreviousLayer->neuronAmount; k++)
+                Input += PreviousLayer->neurons[k].output * CurrentLayer->neurons[j].biases[k] + CurrentLayer->neurons[j].weights[k];
+            
+            // The activation function ReLU(Rectified liniar)
+            if (Input > 0.0f)
+                CurrentLayer->neurons[j].output = Input;
+            else
+                CurrentLayer->neurons[j].output = 0.0f;
+        }
+    }
+}
+
+// void LoadNetwork(Network *network, char location )
+// {
+    
+// } 
+

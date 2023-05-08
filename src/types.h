@@ -1,4 +1,5 @@
-// #include <stdint.h>
+#ifndef TYPES_H
+#define TYPES_H
 
 typedef struct Neuron
 {
@@ -21,3 +22,5 @@ typedef struct Network
 
     unsigned int layerAmount;
 } Network;
+
+#endif // TYPES_H

@@ -11,4 +11,4 @@ TODO
 - [ ] backprogation why... it is hard (yes true)
 
 
-compile command (because Sweder has small brain): `gcc src/*.c -o Swan.exec -Wall -Wextra -Wpedantic`
+compile command (because Sweder has small brain): `gcc src/*.c src/*/*.c -o Swan.exec -Wall -Wextra -Wpedantic`

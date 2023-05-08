@@ -3,7 +3,10 @@
 A neural network library for C because C is better
 
 
+
+TODO
 - [x] ReLU
+- [x] sigmoid
 - [ ] sofmax activatation function
 - [ ] backprogation why... it is hard (yes true)
 

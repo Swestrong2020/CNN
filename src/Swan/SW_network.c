@@ -71,6 +71,30 @@ void SW_RandomizeNetwork(SW_Network *network)
             }
 }
 
+void SW_SetNetworkInput(SW_Network *network, float *data, unsigned int dataAmount)
+{
+    if (network->layerAmount == 0)
+    {
+        fputs("It's a bit hard to give some input to a completely empty network, isn't it?", stderr);
+        return;
+    }
+
+    if (dataAmount > network->layers[0].neuronAmount)
+    {
+        fputs("Can't set more data in the first layer than there are neurons in the first layer, obviously", stderr);
+        return;
+    }
+
+    if (data == NULL)
+    {
+        fputs("Would be a shame if the input data for the neural network got corrupted and not allocated, wouldn't it? Oh wait, that's the case.", stderr);
+        return;
+    }
+
+    for (unsigned int i = 0; i < dataAmount; i++)
+        network->layers[0].neurons[i].output = data[i];
+}
+
 void SW_ExucuteNetwork(SW_Network *network)
 {
     if (network->layerAmount <= 2)

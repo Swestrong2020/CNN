@@ -1,9 +1,86 @@
 #include <stdio.h>
+#include <stdlib.h>
+#include <stdint.h>
 
 #include "Swan/Swan.h"
 
 int main(void)
 {
+    // Load the MNIST dataset
+    // Some of this is a bit of a mess, because I didn't want to take the effort to fix big and little endianness issues
+    FILE *MNISTLabelFile = fopen("src/MNISTdataset/train-labels-idx1-ubyte", "rb");
+
+    int32_t MNISTLabelsMagicBytes;
+    fread(&MNISTLabelsMagicBytes, sizeof(int32_t), 1, MNISTLabelFile);
+
+    // Magic mumbers are different from the ones provided by the dataset, because of endianness stupidness
+    if (MNISTLabelsMagicBytes != 17301504 && MNISTLabelsMagicBytes != 2049)
+    {
+        puts("Looks like something's wrong with the provided MNIST dataset (label)");
+        printf("%i", MNISTLabelsMagicBytes);
+        return -1;
+    }
+
+    fseek(MNISTLabelFile, SEEK_CUR, sizeof(int32_t));
+
+    uint8_t *MNISTLabels = malloc(sizeof(uint8_t) * 6000);
+
+    fread(MNISTLabels, sizeof(uint8_t), 6000, MNISTLabelFile);
+
+    fclose(MNISTLabelFile);
+
+    FILE *MNISTImageFile = fopen("src/MNISTdataset/train-images-idx3-ubyte", "rb");
+
+    int32_t MNISTImagesMagicBytes;
+    fread(&MNISTImagesMagicBytes, sizeof(int32_t), 1, MNISTImageFile);
+
+    if (MNISTImagesMagicBytes != 50855936 && MNISTImagesMagicBytes != 2051)
+    {
+        puts("Looks like something's wrong with the provided MNIST dataset (image)");
+        return -1;
+    }
+
+    fseek(MNISTImageFile, SEEK_CUR, sizeof(int32_t));
+
+    // I have no idea anymore for some reason this is necessary
+    float TEMP;
+    for (unsigned int i = 0; i < 12; i++)
+        fread(&TEMP, sizeof(uint8_t), 1, MNISTImageFile);
+
+    float **ImageData = malloc(sizeof(float *) * 6000);
+
+    for (int32_t i = 0; i < 6000; i++)
+    {
+        fseek(MNISTImageFile, SEEK_CUR, sizeof(int32_t) * 2);
+
+        ImageData[i] = malloc(sizeof(float) * 28 * 28);
+
+        for (unsigned int j = 0; j < 28 * 28; j++)
+        {
+            uint8_t Val;
+            fread(&Val, sizeof(uint8_t), 1, MNISTImageFile);
+            ImageData[i][j] = Val / 256.0f;
+        }
+    }
+
+    fclose(MNISTImageFile);
+
+    // Debug, test if things loaded succesfully
+    for (int32_t row = 0; row < 28; row++)
+    {
+        for (int32_t column = 0; column < 28; column++)
+        {
+            if (ImageData[0][row * 28 + column] > 0.66f)
+                putchar('x');
+            else if (ImageData[0][row * 28 + column] > 0.33f)
+                putchar('-');
+            else
+                putchar(' ');
+        }
+
+        putchar('\n');
+    }
+
     // Example network
     SW_Network network;
 
@@ -14,10 +91,8 @@ int main(void)
     SW_AddNetworkLayer(&network, 10, SW_ACTIVATION_FUNCTION_SIGMOID);
 
     SW_RandomizeNetwork(&network);
-    network.layers[0].neurons[0].output = 0.9f;
-    network.layers[0].neurons[3].output = 0.8f;
-    network.layers[0].neurons[7].output = 0.6f;
-    network.layers[0].neurons[8].output = 0.5f;
+    
+    SW_SetNetworkInput(&network, ImageData[0], 28 * 28);
 
     SW_ExucuteNetwork(&network);
 

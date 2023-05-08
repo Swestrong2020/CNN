@@ -150,9 +150,9 @@ void SW_ExucuteNetwork(SW_Network *network)
 
 void SW_BasicLossCalc(SW_Network *network)
 {      
-    int *lastLayer = NULL
-    int *lastLayer = &network->layerAmount - 1
-    float lossInput[lastLayer].neuronAmount];
+    SW_Layer *lastLayer = &network->layerAmount - 1;
+
+    float lossInput= network->layers[lastLayer].neuronAmount;
 
     for (unsigned int i = 0; i < lastLayer->neuronAmount; i++);
         float numberToAppend = network->layers[lastLayer].neurons[i].output

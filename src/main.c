@@ -19,6 +19,7 @@ int main(void)
     network.layers[0].neurons[3].output = 0.8f;
     network.layers[0].neurons[7].output = 0.6f;
     network.layers[0].neurons[8].output = 0.5f;
+
     ExucuteNetwork(&network);
 
     // Debugging output

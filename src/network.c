@@ -59,17 +59,6 @@ void AddNetworkLayer(Network *network, unsigned int neuronAmount, ActivationFunc
 
 void RandomizeNetwork(Network *network)
 {
-  for (unsigned int i = 1; i < network->layerAmount; i++)
-    for (unsigned int j = 0; j < network->layers[i].neuronAmount; j++)
-      for (unsigned int k = 0; k < network->layers[i - 1].neuronAmount; k++)
-      {
-        network->layers[i].neurons[j].weights[k] = 0.0f;
-        network->layers[i].neurons[j].biases[k]  = 0.0f;
-      }
-}
-
-void SetNetworkInput(Network *network, float *data, unsigned int dataAmount)
-{
     srand(time(NULL));
 
     for (unsigned int i = 1; i < network->layerAmount; i++)
@@ -79,6 +68,11 @@ void SetNetworkInput(Network *network, float *data, unsigned int dataAmount)
                 network->layers[i].neurons[j].weights[k] = ((float)rand() / (float)RAND_MAX) * 2.0f - 1.0f;
                 network->layers[i].neurons[j].biases[k]  = ((float)rand() / (float)RAND_MAX) * 2.0f - 1.0f;
             }
+}
+
+void SetNetworkInput(Network *network, float *data, unsigned int dataAmoun)
+{
+// unimplemented
 }
 
 void ExucuteNetwork(Network *network)
@@ -101,7 +95,7 @@ void ExucuteNetwork(Network *network)
 
             for (unsigned int k = 0; k < PreviousLayer->neuronAmount; k++)
                 Input += PreviousLayer->neurons[k].output * CurrentLayer->neurons[j].weights[k] + CurrentLayer->neurons[j].biases[k];
-            
+  
             // The activation function ReLU (Rectified linear)
             switch (CurrentLayer->activationFunction)
             {

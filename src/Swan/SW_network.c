@@ -124,9 +124,9 @@ void SW_ExucuteNetwork(SW_Network *network)
 }
 
 
-void SW_BasicLossCalc(SW_Network *network);
-{
-
-    break;
+void SW_BasicLossCalc(SW_Network *network)
+{   
+    float lossInput[network->layers[network->layerAmount - 1].neuronAmount];
+    
 }
 

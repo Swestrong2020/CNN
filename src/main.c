@@ -9,7 +9,7 @@ int main(void)
     Network network;
 
     InitNetwork(&network);
-    AddNetworkLayer(&network, 24, ACTIVATION_FUNCTION_RELU);
+    AddNetworkLayer(&network, 28 * 28, ACTIVATION_FUNCTION_RELU);
     AddNetworkLayer(&network, 32, ACTIVATION_FUNCTION_RELU);
     AddNetworkLayer(&network, 32, ACTIVATION_FUNCTION_RELU);
     AddNetworkLayer(&network, 10, ACTIVATION_FUNCTION_SIGMOID);

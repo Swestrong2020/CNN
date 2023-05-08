@@ -9,6 +9,6 @@ void SW_AddNetworkLayer(SW_Network *network, unsigned int neuronAmount, SW_Activ
 void SW_RandomizeNetwork(SW_Network *network);
 
 void SW_ExucuteNetwork(SW_Network *network);
-float SW_BasicLossCalc(SW_Network *network);
+void SW_BasicLossCalc(SW_Network *network);
 
 #endif // SW_NETWORK_H

@@ -124,8 +124,9 @@ void SW_ExucuteNetwork(SW_Network *network)
 }
 
 
-float SW_BasicLossCalc(SW_Network *network)
+void SW_BasicLossCalc(SW_Network *network);
 {
-    
+
+    break;
 }
 

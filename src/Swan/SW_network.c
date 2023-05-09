@@ -152,12 +152,11 @@ float SW_CalculateLoss(SW_Network *network, float *input, float *correctOutput)
     float Sum = 0.0f;
 
     for (unsigned int i = 0; i < LastLayer->neuronAmount; i++)
-        if(LastLayer->neurons[i].output == 0)
-            Sum -= correctOutput[i] * logf(LastLayer->neurons[i].output+0.00000001f);
-        else if(LastLayer->neurons[i].output /= 0)
-            Sum -= correctOutput[i] * logf(LastLayer->neurons[i].output);
+        // Log is undefined at 0, so there's a bit of extra logic making sure the input doesn't go that low
+        if (LastLayer->neurons[i].output < 0.0001f)
+            Sum -= correctOutput[i] * logf(0.0001f);
         else
-            fputs("You did something wrong good luck finding out what", stderr);
+            Sum -= correctOutput[i] * logf(LastLayer->neurons[i].output);
 
     return Sum;
 }

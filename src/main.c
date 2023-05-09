@@ -91,7 +91,7 @@ int main(void)
 
     SW_RandomizeNetwork(&network);
     
-    SW_SetNetworkInput(&network, ImageData[0], 28 * 28);
+    SW_SetNetworkInput(&network, ImageData[0]);
 
     SW_ExucuteNetwork(&network);
 

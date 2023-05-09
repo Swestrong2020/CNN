@@ -71,7 +71,7 @@ void SW_RandomizeNetwork(SW_Network *network)
             }
 }
 
-void SW_SetNetworkInput(SW_Network *network, float *data, unsigned int dataAmount)
+void SW_SetNetworkInput(SW_Network *network, float *input)
 {
     if (network->layerAmount == 0)
     {
@@ -79,20 +79,14 @@ void SW_SetNetworkInput(SW_Network *network, float *data, unsigned int dataAmoun
         return;
     }
 
-    if (dataAmount > network->layers[0].neuronAmount)
-    {
-        fputs("Can't set more data in the first layer than there are neurons in the first layer, obviously", stderr);
-        return;
-    }
-
-    if (data == NULL)
+    if (input == NULL)
     {
         fputs("Would be a shame if the input data for the neural network got corrupted and not allocated, wouldn't it? Oh wait, that's the case.", stderr);
         return;
     }
 
-    for (unsigned int i = 0; i < dataAmount; i++)
-        network->layers[0].neurons[i].output = data[i];
+    for (unsigned int i = 0; i < network->layers[0].neuronAmount; i++)
+        network->layers[0].neurons[i].output = input[i];
 }
 
 void SW_ExucuteNetwork(SW_Network *network)
@@ -147,8 +141,7 @@ void SW_ExucuteNetwork(SW_Network *network)
     }
 }
 
-
-void SW_BasicLossCalc(SW_Network *network)
+void SW_CalculateLoss(SW_Network *network, float *input, float *correctOutput)
 {      
     SW_Layer *lastLayer = &network->layers[network->layerAmount - 1];
 
@@ -161,3 +154,4 @@ void SW_BasicLossCalc(SW_Network *network)
 
     }
 }
+

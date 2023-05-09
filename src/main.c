@@ -121,5 +121,18 @@ int main(void)
 
     printf("Output value: %u\n", LargestWeightValue);
 
+
+    // Calculate the loss
+    unsigned int TestImageID = 0;
+
+    float *CorrectOutput = malloc(sizeof(float) * 10);
+    
+    for (unsigned int i = 0; i < 10; i++)
+        CorrectOutput[i] = 0.0f;
+
+    CorrectOutput[MNISTLabels[TestImageID]] = 1.0f;
+
+    printf("Loss: %f\n", SW_CalculateLoss(&network, ImageData[TestImageID], CorrectOutput));
+
     return 0;
 }

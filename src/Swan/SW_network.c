@@ -141,7 +141,7 @@ void SW_ExucuteNetwork(SW_Network *network)
     }
 }
 
-void SW_CalculateLoss(SW_Network *network, float *input, float *correctOutput)
+float SW_CalculateLoss(SW_Network *network, float *input, float *correctOutput)
 {      
     SW_Layer *lastLayer = &network->layers[network->layerAmount - 1];
 
@@ -153,5 +153,7 @@ void SW_CalculateLoss(SW_Network *network, float *input, float *correctOutput)
 
 
     }
+
+    return 0.0f;
 }
 

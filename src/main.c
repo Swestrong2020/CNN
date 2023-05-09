@@ -13,6 +13,9 @@ int main(void)
     int32_t MNISTLabelsMagicBytes;
     fread(&MNISTLabelsMagicBytes, sizeof(int32_t), 1, MNISTLabelFile);
 
+    // Sure read unnecesary data into some temp value nothing can go wrong with that (fseek was too hard)
+    float TEMP;
+
     // Magic mumbers are different from the ones provided by the dataset, because of endianness stupidness
     if (MNISTLabelsMagicBytes != 17301504 && MNISTLabelsMagicBytes != 2049)
     {
@@ -21,7 +24,7 @@ int main(void)
         return -1;
     }
 
-    fseek(MNISTLabelFile, SEEK_CUR, sizeof(int32_t));
+    fread(&TEMP, sizeof(uint32_t), 1, MNISTLabelFile);
 
     uint8_t *MNISTLabels = malloc(sizeof(uint8_t) * 6000);
 
@@ -40,18 +43,14 @@ int main(void)
         return -1;
     }
 
-    fseek(MNISTImageFile, SEEK_CUR, sizeof(int32_t));
-
-    // I have no idea anymore for some reason this is necessary
-    float TEMP;
-    for (unsigned int i = 0; i < 12; i++)
-        fread(&TEMP, sizeof(uint8_t), 1, MNISTImageFile);
+    fread(&TEMP, sizeof(uint32_t), 1, MNISTImageFile);
 
     float **ImageData = malloc(sizeof(float *) * 6000);
 
     for (int32_t i = 0; i < 6000; i++)
     {
-        fseek(MNISTImageFile, SEEK_CUR, sizeof(int32_t) * 2);
+        fread(&TEMP, sizeof(int32_t), 1, MNISTImageFile);
+        fread(&TEMP, sizeof(int32_t), 1, MNISTImageFile);
 
         ImageData[i] = malloc(sizeof(float) * 28 * 28);
 

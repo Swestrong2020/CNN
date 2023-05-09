@@ -143,17 +143,21 @@ void SW_ExucuteNetwork(SW_Network *network)
 
 float SW_CalculateLoss(SW_Network *network, float *input, float *correctOutput)
 {      
-    SW_Layer *lastLayer = &network->layers[network->layerAmount - 1];
+    SW_SetNetworkInput(network, input);
+    SW_ExucuteNetwork(network);
 
-    float lossInput = lastLayer->neurons->output;
+    SW_Layer *LastLayer = &network->layers[network->layerAmount - 1];
 
-    for (unsigned int i = 0; i < lastLayer->neuronAmount; i++)
-    {
-        float numberToAppend = lastLayer->neurons[i].output;
+    // Categorical cross-entropy loss
+    float Sum = 0.0f;
 
+    for (unsigned int i = 0; i < LastLayer->neuronAmount; i++)
+        if(LastLayer->neurons[i].output == 0)
+            Sum -= correctOutput[i] * logf(LastLayer->neurons[i].output+0.00000001f);
+        else if(LastLayer->neurons[i].output /= 0)
+            Sum -= correctOutput[i] * logf(LastLayer->neurons[i].output);
+        else
+            fputs("You did something wrong good luck finding out what", stderr);
 
-    }
-
-    return 0.0f;
+    return Sum;
 }
-

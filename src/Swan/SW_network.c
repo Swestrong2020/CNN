@@ -200,7 +200,7 @@ float SW_CalculateLoss(SW_Network *network, SW_LossFunction lossFunction, float 
     return Result;
 }
 
-void SW_TrainGradientDescent(SW_Network *network, float **input, float **correctOutput, unsigned int batchSize, float minimumLoss, SW_LossFunction LossFunction)
+void SW_TrainNeuralNetwork(SW_Network *network, float **input, float **correctOutput, unsigned int batchSize, float minimumLoss, SW_LossFunction LossFunction)
 {
 
     float AverageLoss = 100;
@@ -220,7 +220,7 @@ void SW_TrainGradientDescent(SW_Network *network, float **input, float **correct
 
         }
         AverageLoss /= batchSize;
-        
+        printf("Current Loss Is: %f.4", AverageLoss);
     }   
 
 }

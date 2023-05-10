@@ -220,7 +220,7 @@ void SW_TrainGradientDescent(SW_Network *network, float **input, float **correct
 
         }
         AverageLoss /= batchSize;
-              
+        
     }   
 
 }

@@ -89,6 +89,20 @@ void SW_SetNetworkInput(SW_Network *network, float *input)
         network->layers[0].neurons[i].output = input[i];
 }
 
+void SW_TrainNeuralNet(SW_Network *network, float **input, unsigned int batchSize);
+{
+    if (network->layerAmount <= 2)
+    {
+        fputs("You can't train a network without any layers, potato", stderr);
+        return;
+    }
+
+
+
+
+
+}
+
 void SW_ExucuteNetwork(SW_Network *network)
 {
     if (network->layerAmount <= 2)
@@ -162,3 +176,4 @@ float SW_CalculateLoss(SW_Network *network, float *input, float *correctOutput)
             
     return Sum;
 }
+

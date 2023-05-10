@@ -5,6 +5,7 @@
 
 void SW_InitNetwork(SW_Network *network);
 void SW_AddNetworkLayer(SW_Network *network, unsigned int neuronAmount, SW_ActivationFunction activationFunction);
+void SW_UnloadNetwork(SW_Network *network);
 
 void SW_RandomizeNetwork(SW_Network *network);
 

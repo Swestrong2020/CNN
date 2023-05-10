@@ -132,7 +132,9 @@ int main(void)
 
     CorrectOutput[MNISTLabels[TestImageID]] = 1.0f;
 
-    printf("Loss: %f\n", SW_CalculateLoss(&network, SW_LOSS_FUNCTION_MEAN_SQUARED_ERROR, ImageData[TestImageID], CorrectOutput));
+    printf("Loss: %f\n", SW_CalculateLoss(&network, SW_LOSS_FUNCTION_CROSS_ENTROPY, ImageData[TestImageID], CorrectOutput));
+
+    SW_UnloadNetwork(&network);
 
     return 0;
 }

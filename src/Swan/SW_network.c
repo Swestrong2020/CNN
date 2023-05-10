@@ -121,7 +121,7 @@ float SW_TrainNeuralNetwork(SW_Network *network, float **input, unsigned int inp
 
         }
         AverageLoss /= batchSize;
-        minimumLoss -= 1;
+        // minimumLoss -= 1;
     }   
 
     return AverageLoss;

@@ -57,16 +57,16 @@ void SW_AddNetworkLayer(SW_Network *network, unsigned int neuronAmount, SW_Activ
     }
 }
 
-void SW_UnloadNetwork(SW_network *network)
+void SW_UnloadNetwork(SW_Network *network)
 {
     for (unsigned int i = 0; i < network->layerAmount; i++)
     {
-        if (j > 0)
+        if (i > 0)
         {
             for (unsigned int j = 0; j < network->layers[i].neuronAmount; j++)
             {
-                free(network->layers[i]->neurons[j].weights);
-                free(network->layers[i].neuns[j].biases);
+                free(network->layers[i].neurons[j].weights);
+                free(network->layers[i].neurons[j].biases);
             }
         }
 
@@ -200,10 +200,11 @@ float SW_CalculateLoss(SW_Network *network, SW_LossFunction lossFunction, float 
     return Result;
 }
 
-void SW_TrainGradientDescent(SW_Network *network, float **input, unsigned int inputAmount, unsigned int batchSize, float minimumLoss)
+void SW_TrainGradientDescent(SW_Network *network, float **input, float **correctOutput, unsigned int batchSize, float minimumLoss, SW_LossFunction LossFunction)
 {
 
     float AverageLoss = 100;
+    
 
     if (network->layerAmount <= 2)
     {
@@ -211,10 +212,16 @@ void SW_TrainGradientDescent(SW_Network *network, float **input, unsigned int in
         return;
     }
 
-    //while (AverageLoss > minimumLoss)
-    //{     
-        //SW_CalculateLoss();        
-    //}   
+    while (AverageLoss > minimumLoss)
+    {     
+        for (int i = 0; i < batchSize; i++)
+        {
+            AverageLoss += SW_CalculateLoss(network, LossFunction, input[i], correctOutput[i]);
+
+        }
+        AverageLoss /= batchSize;
+              
+    }   
 
 }
 

@@ -195,10 +195,10 @@ float SW_CalculateLoss(SW_Network *network, SW_LossFunction lossFunction, float 
 
         for (unsigned int i = 0; i < LastLayer->neuronAmount; i++)
             // Log is undefined at 0, so there's a bit of extra logic making sure the input doesn't go that low
-            if (correctOutput[i] < 0.000001f)
-                Result -= LastLayer->neurons[i].output * logf(0.0001f);
+            if (LastLayer->neurons[i].output < 0.000001f)
+                Result -= correctOutput[i] * logf(0.0001f);
             else
-                Result -= LastLayer->neurons[i].output * logf(correctOutput[i]);
+                Result -= correctOutput[i] * logf(LastLayer->neurons[i].output);
         break;
 
     case SW_LOSS_FUNCTION_MEAN_SQUARED_ERROR:

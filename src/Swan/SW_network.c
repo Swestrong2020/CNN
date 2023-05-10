@@ -108,6 +108,25 @@ void SW_SetNetworkInput(SW_Network *network, float *input)
         network->layers[0].neurons[i].output = input[i];
 }
 
+float SW_TrainNeuralNetwork(SW_Network *network, float **input, unsigned int inputAmount, unsigned int batchSize, float targetLoss, SW_LossFunction lossFunction)
+{
+    // Okay this really needs to be fixed
+    float AverageLoss = 10;
+
+    //while (AverageLoss > targetLoss)
+    {     
+        for (unsigned int i = 0; i < batchSize; i++)
+        {
+            //AverageLoss += SW_CalculateLoss(network, LossFunction, input[i], correctOutput[i]);
+
+        }
+        AverageLoss /= batchSize;
+        minimumLoss -= 1;
+    }   
+
+    return AverageLoss;
+}
+
 void SW_ExucuteNetwork(SW_Network *network)
 {
     if (network->layerAmount <= 2)
@@ -199,23 +218,3 @@ float SW_CalculateLoss(SW_Network *network, SW_LossFunction lossFunction, float 
 
     return Result;
 }
-
-float SW_TrainNeuralNetwork(SW_Network *network, float **input, float **correctOutput, unsigned int batchSize, float minimumLoss, SW_LossFunction LossFunction)
-{
-
-    float AverageLoss = 10;
-
-    while (AverageLoss > minimumLoss)
-    {     
-        for (unsigned int i = 0; i < batchSize; i++)
-        {
-            AverageLoss += SW_CalculateLoss(network, LossFunction, input[i], correctOutput[i]);
-
-        }
-        AverageLoss /= batchSize;
-        minimumLoss -= 1;
-    }   
-
-    return AverageLoss;
-}
-

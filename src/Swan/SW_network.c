@@ -176,7 +176,7 @@ void SW_TrainNeuralNetGradientDecent(SW_Network *network, float **input, unsigne
 
     while (AvrageLoss > minimumLoss)
     {      
-        SW_CalculateLoss()        
+        SW_CalculateLoss();        
     }    
 
 }

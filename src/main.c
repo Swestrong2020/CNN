@@ -133,10 +133,8 @@ int main(void)
     CorrectOutput[MNISTLabels[TestImageID]] = 1.0f;
 
     printf("Loss: %f\n", SW_CalculateLoss(&network, SW_LOSS_FUNCTION_CROSS_ENTROPY, ImageData[TestImageID], CorrectOutput));
-    printf("Avrage Loss: %f\n", SW_TrainNeuralNetwork(&network, ImageData, &CorrectOutput, 10, 0, SW_LOSS_FUNCTION_CROSS_ENTROPY));
 
-
-    // SW_UnloadNetwork(&network);
+    SW_UnloadNetwork(&network);
 
     return 0;
 }

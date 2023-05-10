@@ -221,6 +221,7 @@ void SW_TrainNeuralNetwork(SW_Network *network, float **input, float **correctOu
         }
         AverageLoss /= batchSize;
         printf("Current Loss Is: %f.4", AverageLoss);
+        minimumLoss--;
     }   
 
 }

@@ -200,29 +200,22 @@ float SW_CalculateLoss(SW_Network *network, SW_LossFunction lossFunction, float 
     return Result;
 }
 
-void SW_TrainNeuralNetwork(SW_Network *network, float **input, float **correctOutput, unsigned int batchSize, float minimumLoss, SW_LossFunction LossFunction)
+float SW_TrainNeuralNetwork(SW_Network *network, float **input, float **correctOutput, unsigned int batchSize, float minimumLoss, SW_LossFunction LossFunction)
 {
 
-    float AverageLoss = 100;
-    
-
-    if (network->layerAmount <= 2)
-    {
-        fputs("You can't train a network without any layers, potato", stderr);
-        return;
-    }
+    float AverageLoss = 10;
 
     while (AverageLoss > minimumLoss)
     {     
-        for (int i = 0; i < batchSize; i++)
+        for (unsigned int i = 0; i < batchSize; i++)
         {
             AverageLoss += SW_CalculateLoss(network, LossFunction, input[i], correctOutput[i]);
 
         }
         AverageLoss /= batchSize;
-        printf("Current Loss Is: %f.4", AverageLoss);
-        minimumLoss--;
+        minimumLoss -= 1;
     }   
 
+    return AverageLoss;
 }
 

@@ -7,7 +7,6 @@ A neural network library for C because C is better
 TODO
 - [x] Loss calculations
 - [ ] sofmax activatation function (it's hard okay)
-- [ ] gradient descent
 - [ ] backprogation why... it is hard (yes true)
 
 

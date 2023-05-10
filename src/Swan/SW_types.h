@@ -17,6 +17,12 @@ typedef enum SW_ActivationFunction
     SW_ACTIVATION_FUNCTION_TANH
 } SW_ActivationFunction;
 
+typedef enum SW_LossFunction
+{
+    SW_LOSS_FUNCTION_CROSS_ENTROPY = 0,
+    SW_LOSS_FUNCTION_MEAN_SQUARED_ERROR
+} SW_LossFunction;
+
 typedef struct SW_Layer
 {
     SW_Neuron *neurons;

@@ -133,7 +133,7 @@ void SW_ExucuteNetwork(SW_Network *network)
                 break;
 
             default:
-                puts("OH GOD YOU HAVE NO ACTIVATION FUNCTION WHAT HAVE YOU DONE");
+                fputs("OH GOD YOU HAVE NO ACTIVATION FUNCTION WHAT HAVE YOU DONE", stderr);
                 CurrentLayer->neurons[j].output = Input;
                 break;
             }
@@ -141,32 +141,50 @@ void SW_ExucuteNetwork(SW_Network *network)
     }
 }
 
-float SW_CalculateLoss(SW_Network *network, float *input, float *correctOutput)
+float SW_CalculateLoss(SW_Network *network, SW_LossFunction lossFunction, float *input, float *correctOutput)
 {      
     SW_SetNetworkInput(network, input);
     SW_ExucuteNetwork(network);
 
     SW_Layer *LastLayer = &network->layers[network->layerAmount - 1];
 
-    // Categorical cross-entropy loss
-    float Sum = 0.0f;
+    float Result;
 
-    for (unsigned int i = 0; i < LastLayer->neuronAmount; i++)
-        // Log is undefined at 0, so there's a bit of extra logic making sure the input doesn't go that low
+    switch (lossFunction)
+    {
+    case SW_LOSS_FUNCTION_CROSS_ENTROPY:
+        Result = 0.0f;
+
+        for (unsigned int i = 0; i < LastLayer->neuronAmount; i++)
+            // Log is undefined at 0, so there's a bit of extra logic making sure the input doesn't go that low
             if (correctOutput[i] < 0.000001f)
-                Sum -= LastLayer->neurons[i].output * logf(0.0001f);
-        
+                Result -= LastLayer->neurons[i].output * logf(0.0001f);
             else
-                Sum -= LastLayer->neurons[i].output * logf(correctOutput[i]);
+                Result -= LastLayer->neurons[i].output * logf(correctOutput[i]);
+        break;
 
-            
-    return Sum;
+    case SW_LOSS_FUNCTION_MEAN_SQUARED_ERROR:
+        Result = 0.0f;
+
+        for (unsigned int i = 0; i < LastLayer->neuronAmount; i++)
+            Result += (correctOutput[i] - LastLayer->neurons[i].output) * (correctOutput[i] - LastLayer->neurons[i].output);
+
+        Result /= LastLayer->neuronAmount;
+        break;
+
+    default:
+        fputs("That's not really a loss function...", stderr);
+        Result = 0.0f;
+        break;
+    }
+
+    return Result;
 }
 
-void SW_TrainNeuralNetGradientDecent(SW_Network *network, float **input, unsigned int batchSize, float minimumLoss)
+void SW_TrainGradientDescent(SW_Network *network, float **input, unsigned int inputAmount, unsigned int batchSize, float minimumLoss)
 {
 
-    float AvrageLoss = 100;
+    float AverageLoss = 100;
 
     if (network->layerAmount <= 2)
     {
@@ -174,10 +192,10 @@ void SW_TrainNeuralNetGradientDecent(SW_Network *network, float **input, unsigne
         return;
     }
 
-    while (AvrageLoss > minimumLoss)
-    {      
-        SW_CalculateLoss();        
-    }    
+    //while (AverageLoss > minimumLoss)
+    //{     
+        //SW_CalculateLoss();        
+    //}   
 
 }
 

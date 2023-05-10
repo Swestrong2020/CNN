@@ -163,7 +163,7 @@ float SW_CalculateLoss(SW_Network *network, float *input, float *correctOutput)
     return Sum;
 }
 
-void SW_TrainNeuralNet(SW_Network *network, float **input, unsigned int batchSize, float minimumLoss)
+void SW_TrainNeuralNetGradientDecent(SW_Network *network, float **input, unsigned int batchSize, float minimumLoss)
 {
 
     float AvrageLoss = 100;

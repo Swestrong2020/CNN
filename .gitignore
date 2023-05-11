@@ -3,7 +3,5 @@
 
 *.code-workspace
 *.exec
-
 .vscode
-
 *.out

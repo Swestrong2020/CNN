@@ -246,6 +246,14 @@ void SW_SaveNetwork(SW_Network *network, char *fileName)
 
 void SW_LoadNetwork(SW_Network *network, char *fileName)
 {
+    FILE *File = fopen(fileName, "rb");
+
+    if (File == NULL)
+    {
+        fputs("If you want to open a file it should be there", stderr);
+        return;
+    }
+
 
 }
 

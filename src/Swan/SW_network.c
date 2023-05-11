@@ -250,10 +250,32 @@ void SW_LoadNetwork(SW_Network *network, char *fileName)
 
     if (File == NULL)
     {
-        fputs("If you want to open a file it should be there", stderr);
+        fputs("That file isnt there for you, just like you dad", stderr);
         return;
     }
 
+    fread(&network->layerAmount, sizeof(unsigned int), 1, File);
 
+    network->layers = malloc(sizeof(SW_Layer) * network->layerAmount);
+
+    for (unsigned int i = 0; i < network->layerAmount; i++)
+    {
+        fread(&network->layers[i].activationFunction, sizeof(SW_LossFunction), 1, File);
+        fread(&network->layers[i].neuronAmount, sizeof(unsigned int), 1, File);
+        
+        network->layers[i].neurons = malloc(sizeof(SW_Neuron) * network->layers[i].neuronAmount);
+
+        for (unsigned int j = 0; j < network->layers[i].neuronAmount; j++)
+        {
+            if (i > 0)
+            {
+                network->layers[i].neurons[j].weights = malloc(sizeof(float) * network->layers[i - 1].neuronAmount);
+                fread(&network->layers[i].neurons[j].weights, sizeof(float), network->layers[i - 1].neuronAmount, File);
+
+                fread(&network->layers[i].neurons[j].bias, sizeof(float), 1, File);
+            }
+        }
+    }
+
+    fclose(File);
 }
-

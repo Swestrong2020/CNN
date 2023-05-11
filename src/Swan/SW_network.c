@@ -108,7 +108,7 @@ void SW_SetNetworkInput(SW_Network *network, float *input)
         network->layers[0].neurons[i].output = input[i];
 }
 
-void SW_TrainNeuralNetwork(SW_Network *network, float **input, unsigned int inputAmount, unsigned int batchSize, float targetLoss, SW_LossFunction lossFunction)
+void SW_TrainNeuralNetwork(SW_Network *network, float **input, float **correctOutput, unsigned int dataAmount, unsigned int batchSize, float targetLoss, SW_LossFunction lossFunction)
 {
     // Let's start simple with only the core of the algorithm for now (back propagation)
     // That core of the algorithm is taking just one input and its label, and adjusting the weights and biases for that one case

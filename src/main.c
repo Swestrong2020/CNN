@@ -1,11 +1,14 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <stdint.h>
+#include <string.h>
 
 #include "Swan/Swan.h"
 
 int main(void)
 {
+    unsigned int TestImageID = 0;
+
     // Load the MNIST dataset
     // Some of this is a bit of a mess, because I didn't want to take the effort to fix big and little endianness issues
     FILE *MNISTLabelFile = fopen("src/MNISTdataset/train-labels-idx1-ubyte", "rb");
@@ -69,9 +72,9 @@ int main(void)
     {
         for (int32_t column = 0; column < 28; column++)
         {
-            if (ImageData[0][row * 28 + column] > 0.66f)
+            if (ImageData[TestImageID][row * 28 + column] > 0.66f)
                 putchar('x');
-            else if (ImageData[0][row * 28 + column] > 0.33f)
+            else if (ImageData[TestImageID][row * 28 + column] > 0.33f)
                 putchar('-');
             else
                 putchar(' ');
@@ -91,8 +94,19 @@ int main(void)
 
     SW_RandomizeNetwork(&network);
     
-    SW_SetNetworkInput(&network, ImageData[0]);
+    // Calculate all the correct outputs to train the network with
+    float **CorrectOutput = malloc(sizeof(float *) * 6000);
 
+    for (unsigned int i = 0; i < 6000; i++)
+    {
+        CorrectOutput[i] = malloc(sizeof(float) * 10);
+        memset(CorrectOutput[i], 0, sizeof(float) * 10);
+        CorrectOutput[i][MNISTLabels[i]] = 1.0f;
+    }
+
+    SW_TrainNeuralNetwork(&network, ImageData, CorrectOutput, 6000, 1, 0.1f, SW_LOSS_FUNCTION_MEAN_SQUARED_ERROR);
+
+    SW_SetNetworkInput(&network, ImageData[TestImageID]);
     SW_ExucuteNetwork(&network);
 
     // Debugging output
@@ -121,20 +135,11 @@ int main(void)
 
     printf("Output value: %u\n", LargestWeightValue);
 
-
     // Calculate the loss
-    unsigned int TestImageID = 0;
-
-    float *CorrectOutput = malloc(sizeof(float) * 10);
-    
-    for (unsigned int i = 0; i < 10; i++)
-        CorrectOutput[i] = 0.0f;
-
-    CorrectOutput[MNISTLabels[TestImageID]] = 1.0f;
-
-    printf("Loss: %f\n", SW_CalculateLoss(&network, SW_LOSS_FUNCTION_CROSS_ENTROPY, ImageData[TestImageID], CorrectOutput));
+    printf("Loss: %f\n", SW_CalculateLoss(&network, SW_LOSS_FUNCTION_MEAN_SQUARED_ERROR, ImageData[TestImageID], CorrectOutput[TestImageID]));
 
     SW_UnloadNetwork(&network);
 
     return 0;
 }
+

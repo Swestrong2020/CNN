@@ -5,3 +5,5 @@
 *.exec
 
 .vscode
+
+*.out

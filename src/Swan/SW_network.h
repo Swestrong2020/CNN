@@ -15,5 +15,8 @@ void SW_TrainNeuralNetwork(SW_Network *network, float **input, float **correctOu
 void SW_ExucuteNetwork(SW_Network *network);
 float SW_CalculateLoss(SW_Network *network, SW_LossFunction lossFunction, float *input, float *correctOutput); // input should have the same length as the first layer in the network, and correctOutput should have the same length as the last layer in the network
 
+void SW_SaveNetwork(SW_Network *network, char *fileName);
+void SW_LoadNetwork(SW_Network *network, char *fileName);
 
 #endif // SW_NETWORK_H
+

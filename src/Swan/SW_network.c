@@ -212,3 +212,40 @@ float SW_CalculateLoss(SW_Network *network, SW_LossFunction lossFunction, float 
 
     return Result;
 }
+
+void SW_SaveNetwork(SW_Network *network, char *fileName)
+{
+    FILE *File = fopen(fileName, "wb");
+
+    if (File == NULL)
+    {
+        fputs("Looks like your hard drive is dumb", stderr);
+        return;
+    }
+
+    fwrite(&network->layerAmount, sizeof(unsigned int), 1, File);
+
+    for (unsigned int i = 0; i < network->layerAmount; i++)
+    {
+        fwrite(&network->layers[i].activationFunction, sizeof(SW_LossFunction), 1, File);
+        fwrite(&network->layers[i].neuronAmount, sizeof(unsigned int), 1, File);
+        
+        for (unsigned int j = 0; j < network->layers[i].neuronAmount; j++)
+        {
+            if (i > 0)
+            {
+                fwrite(&network->layers[i].neurons[j].weights, sizeof(float), network->layers[i - 1].neuronAmount, File);
+
+                fwrite(&network->layers[i].neurons[j].bias, sizeof(float), 1, File);
+            }
+        }
+    }
+
+    fclose(File);
+}
+
+void SW_LoadNetwork(SW_Network *network, char *fileName)
+{
+
+}
+

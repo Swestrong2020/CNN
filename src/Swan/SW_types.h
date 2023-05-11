@@ -4,7 +4,7 @@
 typedef struct SW_Neuron
 {
     float *weights; // The weights for each connection with a neurons in the previous layer
-    float *biases;  // The biases for each connection with a neurons in the previous layer
+    float bias;  // The bias for the neuron
 
     float output;   // Its output
 } SW_Neuron;

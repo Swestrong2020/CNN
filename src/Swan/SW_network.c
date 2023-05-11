@@ -46,11 +46,10 @@ void SW_AddNetworkLayer(SW_Network *network, unsigned int neuronAmount, SW_Activ
 
         for (unsigned int i = 0; i < neuronAmount; i++)
         {
-            CurrentLayer->neurons[i].biases = malloc(sizeof(float) * PreviousLayerNeuronAmount);
-            memset(CurrentLayer->neurons[i].biases, 0, sizeof(float) * PreviousLayerNeuronAmount);
-
             CurrentLayer->neurons[i].weights = malloc(sizeof(float) * PreviousLayerNeuronAmount);
             memset(CurrentLayer->neurons[i].weights, 0, sizeof(float) * PreviousLayerNeuronAmount);
+
+            CurrentLayer->neurons[i].bias = 0.0f;
 
             CurrentLayer->neurons[i].output = 0.0f;
         }
@@ -64,10 +63,7 @@ void SW_UnloadNetwork(SW_Network *network)
         if (i > 0)
         {
             for (unsigned int j = 0; j < network->layers[i].neuronAmount; j++)
-            {
                 free(network->layers[i].neurons[j].weights);
-                free(network->layers[i].neurons[j].biases);
-            }
         }
 
         free(network->layers[i].neurons);
@@ -83,11 +79,12 @@ void SW_RandomizeNetwork(SW_Network *network)
 
     for (unsigned int i = 1; i < network->layerAmount; i++)
         for (unsigned int j = 0; j < network->layers[i].neuronAmount; j++)
+        {
             for (unsigned int k = 0; k < network->layers[i - 1].neuronAmount; k++)
-            {
                 network->layers[i].neurons[j].weights[k] = ((float)rand() / (float)RAND_MAX) * 2.0f - 1.0f;
-                network->layers[i].neurons[j].biases[k]  = ((float)rand() / (float)RAND_MAX) * 2.0f - 1.0f;
-            }
+
+            network->layers[i].neurons[j].bias = ((float)rand() / (float)RAND_MAX) * 2.0f - 1.0f;
+        }
 }
 
 void SW_SetNetworkInput(SW_Network *network, float *input)
@@ -141,7 +138,9 @@ void SW_ExucuteNetwork(SW_Network *network)
             float Input = 0.0f;
 
             for (unsigned int k = 0; k < PreviousLayer->neuronAmount; k++)
-                Input += PreviousLayer->neurons[k].output * CurrentLayer->neurons[j].weights[k] + CurrentLayer->neurons[j].biases[k];
+                Input += PreviousLayer->neurons[k].output * CurrentLayer->neurons[j].weights[k];
+            
+            Input += CurrentLayer->neurons[j].bias;
   
             // The activation function ReLU (Rectified linear)
             switch (CurrentLayer->activationFunction)

@@ -8,6 +8,8 @@
 *.a
 *.exe
 
+build
+
 CMakeLists.txt.user
 CMakeCache.txt
 CMakeFiles

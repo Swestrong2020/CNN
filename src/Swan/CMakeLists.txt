@@ -5,3 +5,4 @@ add_library(libswan STATIC
 )
 
 target_include_directories(libswan PUBLIC ./)
+target_link_libraries(libswan m)

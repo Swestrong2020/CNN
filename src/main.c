@@ -11,7 +11,7 @@ int main(void)
 
     // Load the MNIST dataset
     // Some of this is a bit of a mess, because I didn't want to take the effort to fix big and little endianness issues
-    FILE *MNISTLabelFile = fopen("src/MNISTdataset/train-labels-idx1-ubyte", "rb");
+    FILE *MNISTLabelFile = fopen("MNISTdataset/train-labels-idx1-ubyte", "rb");
 
     int32_t MNISTLabelsMagicBytes;
     fread(&MNISTLabelsMagicBytes, sizeof(int32_t), 1, MNISTLabelFile);
@@ -35,7 +35,7 @@ int main(void)
 
     fclose(MNISTLabelFile);
 
-    FILE *MNISTImageFile = fopen("src/MNISTdataset/train-images-idx3-ubyte", "rb");
+    FILE *MNISTImageFile = fopen("MNISTdataset/train-images-idx3-ubyte", "rb");
 
     int32_t MNISTImagesMagicBytes;
     fread(&MNISTImagesMagicBytes, sizeof(int32_t), 1, MNISTImageFile);

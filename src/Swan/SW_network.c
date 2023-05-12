@@ -37,6 +37,12 @@ void SW_AddNetworkLayer(SW_Network *network, unsigned int neuronAmount, SW_Activ
     CurrentLayer->neurons = malloc(sizeof(SW_Neuron) * neuronAmount);
     CurrentLayer->neuronAmount = neuronAmount;
 
+    if (CurrentLayer->neurons == NULL)
+    {
+        fputs("Please get better RAM", stderr);
+        return;
+    }
+
     CurrentLayer->activationFunction = activationFunction;
 
     // Allocate the weights and biases for the neuron (if there is a previous layer to have those values for)
@@ -47,6 +53,12 @@ void SW_AddNetworkLayer(SW_Network *network, unsigned int neuronAmount, SW_Activ
         for (unsigned int i = 0; i < neuronAmount; i++)
         {
             CurrentLayer->neurons[i].weights = malloc(sizeof(float) * PreviousLayerNeuronAmount);
+            if (CurrentLayer->neurons[i].weights == NULL)
+            {
+                fputs("Everything is going wrong again!", stderr);
+                return;
+            }
+
             memset(CurrentLayer->neurons[i].weights, 0, sizeof(float) * PreviousLayerNeuronAmount);
 
             CurrentLayer->neurons[i].bias = 0.0f;
@@ -235,7 +247,6 @@ void SW_SaveNetwork(SW_Network *network, char *fileName)
             if (i > 0)
             {
                 fwrite(&network->layers[i].neurons[j].weights, sizeof(float), network->layers[i - 1].neuronAmount, File);
-
                 fwrite(&network->layers[i].neurons[j].bias, sizeof(float), 1, File);
             }
         }

@@ -94,6 +94,8 @@ int main(void)
 
     SW_RandomizeNetwork(&network);
     
+    //SW_LoadNetwork(&network, "savednetwork");
+
     // Calculate all the correct outputs to train the network with
     float **CorrectOutput = malloc(sizeof(float *) * 6000);
 
@@ -138,7 +140,7 @@ int main(void)
     // Calculate the loss
     printf("Loss: %f\n", SW_CalculateLoss(&network, SW_LOSS_FUNCTION_MEAN_SQUARED_ERROR, ImageData[TestImageID], CorrectOutput[TestImageID]));
 
-    SW_SaveNetwork(&network, "savednetwork");
+    //SW_SaveNetwork(&network, "savednetwork");
 
     SW_UnloadNetwork(&network);
 

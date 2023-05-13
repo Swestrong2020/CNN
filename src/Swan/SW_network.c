@@ -122,13 +122,80 @@ void SW_TrainNeuralNetwork(SW_Network *network, float **input, float **correctOu
     // Let's start simple with only the core of the algorithm for now (back propagation)
     // That core of the algorithm is taking just one input and its label, and adjusting the weights and biases for that one case
   
-// Not finished yet
+// Not finished yet, for now it only works on one image at a time, and half the function arguments are ignored for now
+// It doesn't seem to work fully yet... Also, it only works with mean squared error for now
     unsigned int testid = 0;
+    float LearningRate  = 0.2f;
+
     SW_SetNetworkInput(network, input[testid]);
     SW_ExucuteNetwork(network);
 
-    
+    // Loop backwards through all the layers
+    for (unsigned int i = network->layerAmount - 1; i > 0; i--)
+    {
+        SW_Layer *CurrentLayer = &network->layers[i];
+        SW_Layer *PreviousLayer = &network->layers[i - 1];
+        
+        SW_Layer *NextLayer;
 
+        if (i < network->layerAmount - 1)
+            NextLayer = &network->layers[i + 1];
+
+        for (unsigned int j = 0; j < CurrentLayer->neuronAmount; j++)
+        {
+            // Begin with the part of the calculation thas is shared for each weight (how much the neuron influences the error, and the derivative of the activaion function at the output of the neuron)
+            float Error = 0.0f;
+
+            // The error is simple for the last layer, but it's a bit more complicated for any layer before that
+            if (i < network->layerAmount - 1)
+                for (unsigned int h = 0; h < NextLayer->neuronAmount; h++)
+                    Error += NextLayer->neurons[h].error * NextLayer->neurons[h].activationDerivative * NextLayer->neurons[h].weights[j];
+            else
+                Error = -(correctOutput[testid][j] - CurrentLayer->neurons[j].output);
+
+            // All the derivatives for the different activation functions
+            float ActivationDerivative = 0.0f;
+  
+            switch (CurrentLayer->activationFunction)
+            {
+            case SW_ACTIVATION_FUNCTION_RELU:
+                ActivationDerivative = (CurrentLayer->neurons[j].output > 0.0f) ? 1.0f : 0.0f;
+                break;
+
+            case SW_ACTIVATION_FUNCTION_SOFTMAX:
+                // unimplemented
+                break;
+
+            case SW_ACTIVATION_FUNCTION_SIGMOID:
+                ActivationDerivative = CurrentLayer->neurons[j].output * (1.0f - CurrentLayer->neurons[j].output); 
+                break;
+
+            case SW_ACTIVATION_FUNCTION_TANH:
+                ActivationDerivative = 1 - CurrentLayer->neurons[j].output * CurrentLayer->neurons[j].output;
+                break;
+
+            default:
+                fputs("Uh oh there's no activation function here", stderr);
+                break;
+            }
+
+            // Also save these for the next (or well, previous) layer
+            CurrentLayer->neurons[j].error = Error;
+            CurrentLayer->neurons[j].activationDerivative = ActivationDerivative;
+
+            // Actually adjust all the weights using those values
+            for (unsigned int k = 0; k < PreviousLayer->neuronAmount; k++)
+            {
+                // Calculate by how much to change the weights
+                float Delta = Error * ActivationDerivative * PreviousLayer->neurons[k].output;
+                CurrentLayer->neurons[j].weights[k] -= Delta * LearningRate;
+            }
+
+            // We can just treat the bias the same as a weight, but of which the previous neuron's output is always 1
+            float Delta = Error * ActivationDerivative;
+            CurrentLayer->neurons[j].bias -= Delta * LearningRate;
+        }
+    }
 }
 
 void SW_ExucuteNetwork(SW_Network *network)
@@ -178,7 +245,7 @@ void SW_ExucuteNetwork(SW_Network *network)
 
             default:
                 fputs("OH GOD YOU HAVE NO ACTIVATION FUNCTION WHAT HAVE YOU DONE", stderr);
-                CurrentLayer->neurons[j].output = Input;
+                CurrentLayer->neurons[j].output = 0.0f;
                 break;
             }
         }
@@ -192,13 +259,11 @@ float SW_CalculateLoss(SW_Network *network, SW_LossFunction lossFunction, float 
 
     SW_Layer *LastLayer = &network->layers[network->layerAmount - 1];
 
-    float Result;
+    float Result = 0.0f;
 
     switch (lossFunction)
     {
     case SW_LOSS_FUNCTION_CROSS_ENTROPY:
-        Result = 0.0f;
-
         for (unsigned int i = 0; i < LastLayer->neuronAmount; i++)
             // Log is undefined at 0, so there's a bit of extra logic making sure the input doesn't go that low
             if (LastLayer->neurons[i].output < 0.000001f)
@@ -208,8 +273,6 @@ float SW_CalculateLoss(SW_Network *network, SW_LossFunction lossFunction, float 
         break;
 
     case SW_LOSS_FUNCTION_MEAN_SQUARED_ERROR:
-        Result = 0.0f;
-
         for (unsigned int i = 0; i < LastLayer->neuronAmount; i++)
             Result += (correctOutput[i] - LastLayer->neurons[i].output) * (correctOutput[i] - LastLayer->neurons[i].output);
 
@@ -218,7 +281,6 @@ float SW_CalculateLoss(SW_Network *network, SW_LossFunction lossFunction, float 
 
     default:
         fputs("That's not really a loss function...", stderr);
-        Result = 0.0f;
         break;
     }
 
@@ -259,4 +321,3 @@ void SW_LoadNetwork(SW_Network *network, char *fileName)
 {
 
 }
-

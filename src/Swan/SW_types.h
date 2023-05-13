@@ -7,6 +7,10 @@ typedef struct SW_Neuron
     float bias;  // The bias for the neuron
 
     float output;   // Its output
+
+    // These are used during back propagation for the previous layer
+    float error;
+    float activationDerivative;
 } SW_Neuron;
 
 typedef enum SW_ActivationFunction

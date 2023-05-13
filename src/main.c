@@ -106,20 +106,15 @@ int main(void)
         CorrectOutput[i][MNISTLabels[i]] = 1.0f;
     }
 
-    SW_TrainNeuralNetwork(&network, ImageData, CorrectOutput, 6000, 1, 0.1f, SW_LOSS_FUNCTION_MEAN_SQUARED_ERROR);
+    // A testing loop that shows the loss every so often
+    printf("Loss: %.20f\n", SW_CalculateLoss(&network, SW_LOSS_FUNCTION_MEAN_SQUARED_ERROR, ImageData[TestImageID], CorrectOutput[TestImageID]));
 
-    SW_SetNetworkInput(&network, ImageData[TestImageID]);
-    SW_ExucuteNetwork(&network);
-
-    // Debugging output
-    for (unsigned int i = 0; i < network.layerAmount; i++)
+    for (unsigned int i = 0; i < 5000; i++)
     {
-        printf("%i: ", network.layers[i].activationFunction);
+        SW_TrainNeuralNetwork(&network, ImageData, CorrectOutput, 6000, 1, 0.1f, SW_LOSS_FUNCTION_MEAN_SQUARED_ERROR);
 
-        for (unsigned int j = 0; j < network.layers[i].neuronAmount; j++)
-            printf("%.2f  ", network.layers[i].neurons[j].output);
-
-        putchar('\n');
+        if (i % 100 == 0)
+            printf("Loss: %.20f\n", SW_CalculateLoss(&network, SW_LOSS_FUNCTION_MEAN_SQUARED_ERROR, ImageData[TestImageID], CorrectOutput[TestImageID]));
     }
 
     // Find which neuron was the strongest on the last layer
@@ -128,6 +123,9 @@ int main(void)
 
     for (unsigned int i = 0; i < network.layers[network.layerAmount - 1].neuronAmount; i++)
     {
+        // Also a bit more testing output
+        printf("%.2f ", network.layers[network.layerAmount - 1].neurons[i].output);
+
         if (network.layers[network.layerAmount - 1].neurons[i].output > LargestWeight)
         {
             LargestWeight = network.layers[network.layerAmount - 1].neurons[i].output;
@@ -135,10 +133,7 @@ int main(void)
         }
     }
 
-    printf("Output value: %u\n", LargestWeightValue);
-
-    // Calculate the loss
-    printf("Loss: %f\n", SW_CalculateLoss(&network, SW_LOSS_FUNCTION_MEAN_SQUARED_ERROR, ImageData[TestImageID], CorrectOutput[TestImageID]));
+    printf("\nOutput value: %u\n", LargestWeightValue);
 
     //SW_SaveNetwork(&network, "savednetwork");
 

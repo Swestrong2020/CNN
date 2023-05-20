@@ -7,6 +7,7 @@
 #include <math.h>
 
 #include "SW_types.h"
+#include "SW_util.h"
 
 void SW_InitNetwork(SW_Network *network)
 {
@@ -122,8 +123,8 @@ void SW_TrainNeuralNetwork(SW_Network *network, float **input, float **correctOu
     // Let's start simple with only the core of the algorithm for now (back propagation)
     // That core of the algorithm is taking just one input and its label, and adjusting the weights and biases for that one case
   
-// Not finished yet, for now it only works on one image at a time, and half the function arguments are ignored for now
-// It doesn't seem to work fully yet... Also, it only works with mean squared error for now
+    // Not finished yet, for now it only works on one image at a time, and half the function arguments are ignored for now
+    // It doesn't seem to work fully yet... Also, it only works with mean squared error for now
     uint32_t testid = 0;
     float LearningRate  = 0.2f;
 
@@ -159,7 +160,7 @@ void SW_TrainNeuralNetwork(SW_Network *network, float **input, float **correctOu
             switch (CurrentLayer->activationFunction)
             {
             case SW_ACTIVATION_FUNCTION_RELU:
-                ActivationDerivative = (CurrentLayer->neurons[j].output > 0.0f) ? 1.0f : 0.0f;
+                ActivationDerivative = SW_ReLu_Derivative(CurrentLayer->neurons[j].output);
                 break;
 
             case SW_ACTIVATION_FUNCTION_SOFTMAX:
@@ -167,11 +168,11 @@ void SW_TrainNeuralNetwork(SW_Network *network, float **input, float **correctOu
                 break;
 
             case SW_ACTIVATION_FUNCTION_SIGMOID:
-                ActivationDerivative = CurrentLayer->neurons[j].output * (1.0f - CurrentLayer->neurons[j].output); 
+                ActivationDerivative = SW_Sigmoid_Derivative(CurrentLayer->neurons[j].output); 
                 break;
 
             case SW_ACTIVATION_FUNCTION_TANH:
-                ActivationDerivative = 1 - CurrentLayer->neurons[j].output * CurrentLayer->neurons[j].output;
+                ActivationDerivative = SW_Tanh_Derivative(CurrentLayer->neurons[j].output);
                 break;
 
             default:
@@ -214,21 +215,18 @@ void SW_ExucuteNetwork(SW_Network *network)
 
         for (uint32_t j = 0; j < CurrentLayer->neuronAmount; j++)
         {
-            float Input = 0.0f;
+            float input = 0.0f;
 
             for (uint32_t k = 0; k < PreviousLayer->neuronAmount; k++)
-                Input += PreviousLayer->neurons[k].output * CurrentLayer->neurons[j].weights[k];
+                input += PreviousLayer->neurons[k].output * CurrentLayer->neurons[j].weights[k];
             
-            Input += CurrentLayer->neurons[j].bias;
+            input += CurrentLayer->neurons[j].bias;
   
             // The activation function ReLU (Rectified linear)
             switch (CurrentLayer->activationFunction)
             {
             case SW_ACTIVATION_FUNCTION_RELU:
-                if (Input > 0.0f)
-                    CurrentLayer->neurons[j].output = Input;
-                else
-                    CurrentLayer->neurons[j].output = 0.0f;
+                CurrentLayer->neurons[j].output = SW_ReLu(input);
                 break;
 
             case SW_ACTIVATION_FUNCTION_SOFTMAX:
@@ -236,11 +234,11 @@ void SW_ExucuteNetwork(SW_Network *network)
                 break;
 
             case SW_ACTIVATION_FUNCTION_SIGMOID:
-                CurrentLayer->neurons[j].output = 1.0f / (1.0f + expf(-Input));
+                CurrentLayer->neurons[j].output = SW_Sigmoid(input);
                 break;
 
             case SW_ACTIVATION_FUNCTION_TANH:
-                CurrentLayer->neurons[j].output = tanh(Input) * 0.5f + 0.5f;
+                CurrentLayer->neurons[j].output = SW_Tanh(input);
                 break;
 
             default:

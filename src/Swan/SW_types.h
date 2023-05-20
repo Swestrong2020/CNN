@@ -5,10 +5,10 @@
 
 typedef struct SW_Neuron
 {
-    float *weights; // The weights for each connection with a neurons in the previous layer
-    float bias;  // The bias for the neuron
+    float *weights;             // The weights for each connection with a neurons in the previous layer
+    float bias;                 // The bias for the neuron
 
-    float output;   // Its output
+    float output;               // Its output
 
     // These are used during back propagation for the previous layer
     float error;

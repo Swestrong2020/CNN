@@ -304,13 +304,13 @@ void SW_SaveNetwork(SW_Network *network, char *fileName)
         fwrite(&network->layers[i].activationFunction, sizeof(SW_LossFunction), 1, File);
         fwrite(&network->layers[i].neuronAmount, sizeof(uint32_t), 1, File);
         
+        // neurons store connections to last layer, first layer is... the first, skip that
+        if (i == 0) continue;
+
         for (uint32_t j = 0; j < network->layers[i].neuronAmount; j++)
         {
-            if (i > 0)
-            {
-                fwrite(&network->layers[i].neurons[j].weights, sizeof(float), network->layers[i - 1].neuronAmount, File);
-                fwrite(&network->layers[i].neurons[j].bias, sizeof(float), 1, File);
-            }
+            fwrite(network->layers[i].neurons[j].weights, sizeof(float), network->layers[i - 1].neuronAmount, File);
+            fwrite(&network->layers[i].neurons[j].bias, sizeof(float), 1, File);
         }
     }
 
@@ -319,5 +319,40 @@ void SW_SaveNetwork(SW_Network *network, char *fileName)
 
 void SW_LoadNetwork(SW_Network *network, char *fileName)
 {
+    FILE *file = fopen(fileName, "rb");
 
+    if (file == NULL)
+    {
+        fputs("An oopsie happend with loading ur flies :(", stderr);
+        return;
+    }
+
+    // clear the destination network
+    if (network->layerAmount)
+        SW_UnloadNetwork(network);
+
+    uint32_t layerAmount;
+    fread(&layerAmount, sizeof(uint32_t), 1, file);
+
+    for (uint32_t i = 0; i < layerAmount; i++)
+    {
+        uint32_t activationFunction;
+        fread(&activationFunction, sizeof(SW_LossFunction), 1, file);
+
+        uint32_t neuronAmount;
+        fread(&neuronAmount, sizeof(uint32_t), 1, file);
+
+        SW_AddNetworkLayer(network, neuronAmount, activationFunction);
+
+        // neurons store connections to last layer, first layer is... the first, skip that
+        if (i == 0) continue;
+
+        for (uint32_t j = 0; j < neuronAmount; j++)
+        {
+            fread(network->layers[i].neurons[j].weights, sizeof(float), network->layers[i-1].neuronAmount, file);
+            fread(&(network->layers[i].neurons[j].bias), sizeof(float), 1, file);
+        }
+    }
+    
+    fclose(file);
 }

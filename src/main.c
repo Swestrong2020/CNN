@@ -94,7 +94,7 @@ int main(void)
 
     SW_RandomizeNetwork(&network);
     
-    //SW_LoadNetwork(&network, "savednetwork");
+    // SW_LoadNetwork(&network, "savednetwork");
 
     // Calculate all the correct outputs to train the network with
     float **CorrectOutput = malloc(sizeof(float *) * 6000);

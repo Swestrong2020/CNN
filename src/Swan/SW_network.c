@@ -320,7 +320,7 @@ void SW_LoadNetwork(SW_Network *network, char *fileName)
 {
     if (network->layerAmount)
     {
-        fputs("Network already loaded, watch out, that shit's fatal cuh", stderr);
+        fputs("Attempting to load into existing network, watch out, that shit's fatal cuh\n", stderr);
         abort();
     }
 

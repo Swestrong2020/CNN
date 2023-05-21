@@ -315,8 +315,15 @@ void SW_SaveNetwork(SW_Network *network, char *fileName)
     fclose(File);
 }
 
+/* fails if input network is already loaded */
 void SW_LoadNetwork(SW_Network *network, char *fileName)
 {
+    if (network->layerAmount)
+    {
+        fputs("Network already loaded, watch out, that shit's fatal cuh", stderr);
+        abort();
+    }
+
     FILE *file = fopen(fileName, "rb");
 
     if (file == NULL)
@@ -324,10 +331,6 @@ void SW_LoadNetwork(SW_Network *network, char *fileName)
         fputs("An oopsie happend with loading ur flies :(", stderr);
         return;
     }
-
-    // clear the destination network
-    if (network->layerAmount)
-        SW_UnloadNetwork(network);
 
     uint32_t layerAmount;
     fread(&layerAmount, sizeof(uint32_t), 1, file);

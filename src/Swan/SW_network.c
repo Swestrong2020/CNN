@@ -41,7 +41,7 @@ void SW_AddNetworkLayer(SW_Network *network, uint32_t neuronAmount, SW_Activatio
     if (CurrentLayer->neurons == NULL)
     {
         fputs("Please get better RAM", stderr);
-        return;
+        abort();
     }
 
     CurrentLayer->activationFunction = activationFunction;
@@ -57,7 +57,7 @@ void SW_AddNetworkLayer(SW_Network *network, uint32_t neuronAmount, SW_Activatio
             if (CurrentLayer->neurons[i].weights == NULL)
             {
                 fputs("Everything is going wrong again!", stderr);
-                return;
+                abort();
             }
 
             memset(CurrentLayer->neurons[i].weights, 0, sizeof(float) * PreviousLayerNeuronAmount);

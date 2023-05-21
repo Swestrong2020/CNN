@@ -7,7 +7,7 @@
 
 int main(void)
 {
-    unsigned int TestImageID = 0;
+    uint32_t TestImageID = 0;
 
     // Load the MNIST dataset
     // Some of this is a bit of a mess, because I didn't want to take the effort to fix big and little endianness issues
@@ -57,7 +57,7 @@ int main(void)
 
         ImageData[i] = malloc(sizeof(float) * 28 * 28);
 
-        for (unsigned int j = 0; j < 28 * 28; j++)
+        for (uint32_t j = 0; j < 28 * 28; j++)
         {
             uint8_t Val;
             fread(&Val, sizeof(uint8_t), 1, MNISTImageFile);
@@ -99,7 +99,7 @@ int main(void)
     // Calculate all the correct outputs to train the network with
     float **CorrectOutput = malloc(sizeof(float *) * 6000);
 
-    for (unsigned int i = 0; i < 6000; i++)
+    for (uint32_t i = 0; i < 6000; i++)
     {
         CorrectOutput[i] = malloc(sizeof(float) * 10);
         memset(CorrectOutput[i], 0, sizeof(float) * 10);
@@ -109,7 +109,7 @@ int main(void)
     // A testing loop that shows the loss every so often
     printf("Loss: %.20f\n", SW_CalculateLoss(&network, SW_LOSS_FUNCTION_MEAN_SQUARED_ERROR, ImageData[TestImageID], CorrectOutput[TestImageID]));
 
-    for (unsigned int i = 0; i < 5000; i++)
+    for (uint32_t i = 0; i < 5000; i++)
     {
         SW_TrainNeuralNetwork(&network, ImageData, CorrectOutput, 6000, 1, 0.1f, SW_LOSS_FUNCTION_MEAN_SQUARED_ERROR);
 
@@ -119,9 +119,9 @@ int main(void)
 
     // Find which neuron was the strongest on the last layer
     float LargestWeight = -1.0f;
-    unsigned int LargestWeightValue;
+    uint32_t LargestWeightValue;
 
-    for (unsigned int i = 0; i < network.layers[network.layerAmount - 1].neuronAmount; i++)
+    for (uint32_t i = 0; i < network.layers[network.layerAmount - 1].neuronAmount; i++)
     {
         // Also a bit more testing output
         printf("%.2f ", network.layers[network.layerAmount - 1].neurons[i].output);
@@ -135,10 +135,9 @@ int main(void)
 
     printf("\nOutput value: %u\n", LargestWeightValue);
 
-    //SW_SaveNetwork(&network, "savednetwork");
+    SW_SaveNetwork(&network, "savednetwork");
 
     SW_UnloadNetwork(&network);
 
     return 0;
 }
-

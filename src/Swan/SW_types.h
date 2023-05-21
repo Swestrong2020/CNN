@@ -1,12 +1,14 @@
 #ifndef SW_TYPES_H
 #define SW_TYPES_H
 
+#include <stdint.h>
+
 typedef struct SW_Neuron
 {
-    float *weights; // The weights for each connection with a neurons in the previous layer
-    float bias;  // The bias for the neuron
+    float *weights;             // The weights for each connection with a neurons in the previous layer
+    float bias;                 // The bias for the neuron
 
-    float output;   // Its output
+    float output;               // Its output
 
     // These are used during back propagation for the previous layer
     float error;
@@ -31,7 +33,7 @@ typedef struct SW_Layer
 {
     SW_Neuron *neurons;
 
-    unsigned int neuronAmount;
+    uint32_t neuronAmount;
 
     SW_ActivationFunction activationFunction;
 } SW_Layer;
@@ -40,7 +42,7 @@ typedef struct SW_Network
 {
     SW_Layer *layers;
 
-    unsigned int layerAmount;
+    uint32_t layerAmount;
 } SW_Network;
 
 #endif // SW_TYPES_H

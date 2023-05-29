@@ -1,8 +1,11 @@
-project(libswan)
+project(swan)
 
-add_library(libswan STATIC
+add_subdirectory(matrix)
+
+add_library(swan STATIC
     SW_network.c
 )
 
-target_include_directories(libswan PUBLIC ./)
-target_link_libraries(libswan m)
+target_include_directories(swan PUBLIC ./)
+target_link_libraries(swan swanmatrix)
+target_link_libraries(swan m)

@@ -101,8 +101,7 @@ int main(void)
 
     for (uint32_t i = 0; i < 6000; i++)
     {
-        CorrectOutput[i] = malloc(sizeof(float) * 10);
-        memset(CorrectOutput[i], 0, sizeof(float) * 10);
+        CorrectOutput[i] = calloc(10, sizeof(float));
         CorrectOutput[i][MNISTLabels[i]] = 1.0f;
     }
 

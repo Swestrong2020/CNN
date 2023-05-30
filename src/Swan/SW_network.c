@@ -8,6 +8,7 @@
 
 #include "SW_types.h"
 #include "SW_util.h"
+#include "SW_matrix.h"
 
 void SW_InitNetwork(SW_Network *network)
 {

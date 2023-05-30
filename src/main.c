@@ -87,6 +87,7 @@ int main(void)
     SW_Network network;
 
     SW_InitNetwork(&network);
+
     SW_AddNetworkLayer(&network, 28 * 28, SW_ACTIVATION_FUNCTION_RELU);
     SW_AddNetworkLayer(&network, 32, SW_ACTIVATION_FUNCTION_RELU);
     SW_AddNetworkLayer(&network, 32, SW_ACTIVATION_FUNCTION_RELU);
@@ -140,35 +141,3 @@ int main(void)
 
     return 0;
 }
-
-
-
-
-// #include <stdio.h>
-
-// #include "SW_matrix.h"
-
-// int main(void)
-// {
-//     SWM_Matrix a;
-//     SWM_initMatrix(&a, 2, 5);
-
-//     SWM_set(&a, 0, 0, 6);
-//     SWM_set(&a, 0, 1, 234);
-//     SWM_set(&a, 0, 2, 2);
-//     SWM_set(&a, 0, 3, .87);
-//     SWM_set(&a, 0, 4, 11);
-
-//     SWM_set(&a, 1, 0, 3413);
-//     SWM_set(&a, 1, 1, 1);
-//     SWM_set(&a, 1, 2, 55);
-//     SWM_set(&a, 1, 3, 112.7);
-//     SWM_set(&a, 1, 4, .03);
-
-//     SWM_printm(&a);
-//     fputs("\n", stdout);
-
-//     SWM_destroyMatrix(&a);
-
-//     return 0;
-// }

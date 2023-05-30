@@ -87,6 +87,7 @@ int main(void)
     SW_Network network;
 
     SW_InitNetwork(&network);
+
     SW_AddNetworkLayer(&network, 28 * 28, SW_ACTIVATION_FUNCTION_RELU);
     SW_AddNetworkLayer(&network, 32, SW_ACTIVATION_FUNCTION_RELU);
     SW_AddNetworkLayer(&network, 32, SW_ACTIVATION_FUNCTION_RELU);

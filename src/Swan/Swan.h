@@ -8,4 +8,3 @@
 #include "SW_network.h"
 
 #endif // SWAN_H
-

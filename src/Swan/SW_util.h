@@ -3,6 +3,7 @@
 
 #include <stdint.h>
 #include <math.h>
+#include <stdlib.h>
 
 static inline float SW_Sigmoid(float input)
 {
@@ -63,5 +64,10 @@ static inline float SW_CrossEntropy(float *p, float *q, uint32_t nValues)
     return -r;
 }
 
+static inline float SW_randf(float min, float max)
+{
+    float s = (float)(rand()) / (float)(RAND_MAX);
+    return (s * (max - min)) + min;
+}
 
 #endif // SW_UTIL_H

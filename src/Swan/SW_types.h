@@ -3,17 +3,7 @@
 
 #include <stdint.h>
 
-typedef struct SW_Neuron
-{
-    float *weights;             // The weights for each connection with a neurons in the previous layer
-    float bias;                 // The bias for the neuron
-
-    float output;               // Its output
-
-    // These are used during back propagation for the previous layer
-    float error;
-    float activationDerivative;
-} SW_Neuron;
+#include "SW_matrix.h"
 
 typedef enum SW_ActivationFunction
 {
@@ -31,9 +21,8 @@ typedef enum SW_LossFunction
 
 typedef struct SW_Layer
 {
-    SW_Neuron *neurons;
-
-    uint32_t neuronAmount;
+    SWM_Matrix weights; /* matrix with weights for all neurons in the previous layer */
+    SWM_Matrix biases; /* biases for every neuron in the current layer */
 
     SW_ActivationFunction activationFunction;
 } SW_Layer;
@@ -41,6 +30,7 @@ typedef struct SW_Layer
 typedef struct SW_Network
 {
     SW_Layer *layers;
+    uint32_t inputNeurons;
 
     uint32_t layerAmount;
 } SW_Network;

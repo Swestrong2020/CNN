@@ -1,6 +1,7 @@
 #ifndef SW_MATRIX_H
 #define SW_MATRIX_H
 
+#include <stdio.h>
 #include <stdint.h>
 #include <stdlib.h>
 #include <string.h>
@@ -35,7 +36,7 @@ static inline void SWM_set(SWM_Matrix *matrix, uint32_t row, uint32_t column, SW
 static inline SWM_MatrixData_t SWM_createData(uint32_t rows, uint32_t columns)
 {
     SWM_MatrixData_t data = (SWM_MatrixData_t) malloc(sizeof(SWM_MatrixValue_t) * rows * columns);
-    if (data == NULL) { fputs("Error allocating matrix data\n", stdout); exit(1); }
+    if (data == NULL) { fputs("Error allocating matrix data\n", stderr); exit(1); }
     else { return data; }
 }
 
@@ -56,6 +57,12 @@ void SWM_initMatrixData(SWM_Matrix *matrix, uint32_t rows, uint32_t columns, SWM
 void SWM_destroyMatrix(SWM_Matrix *matrix)
 {
     free(matrix->data);
+}
+
+void SWM_fillMatrix(SWM_Matrix *matrix, float scalar)
+{
+    for (int i = 0, l = matrix->rows * matrix->columns; i < l; i++)
+        matrix->data[i] = scalar;
 }
 
 SWM_MatrixData_t SWM_copyMatrixData(SWM_Matrix *matrix) /* ret freed by caller */

@@ -5,7 +5,7 @@
 
 #include "SW_types.h"
 
-void SW_InitNetwork(SW_Network *network);
+void SW_InitNetwork(SW_Network *network, uint32_t inputNeurons);
 void SW_AddNetworkLayer(SW_Network *network, uint32_t neuronAmount, SW_ActivationFunction activationFunction);
 void SW_UnloadNetwork(SW_Network *network);
 

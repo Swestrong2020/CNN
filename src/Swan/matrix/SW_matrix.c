@@ -32,7 +32,7 @@ SWM_Matrix SWM_multiplyMatrix(SWM_Matrix *a, SWM_Matrix *b)
 {
     if (a->columns != b->rows)
     {
-        fputs("Error multiplying two matrices of different sizes\n", stdout);
+        fputs("Error multiplying two matrices of different sizes\n", stderr);
         exit(1);
     }
 
@@ -41,6 +41,7 @@ SWM_Matrix SWM_multiplyMatrix(SWM_Matrix *a, SWM_Matrix *b)
     SWM_initMatrix(&out, a->rows, b->columns);
 
     // iterate and multiply
+    // SLOW METHOD DAYUM
     for (uint32_t i = 0, li = a->rows; i < li; i++)
     for (uint32_t j = 0, lj = b->columns; j < lj; j++)
     for (uint32_t k = 0, lk = b->rows; k < lk; k++)
@@ -72,7 +73,7 @@ void SWM_printm(SWM_Matrix *matrix)
 {
     if (matrix->rows == 0 || matrix->columns == 0)
     {
-        fputs("Not printing empty matrix >:(", stdout);
+        fputs("Not printing empty matrix >:(", stderr);
     }
     
     fprintf(stdout, "(%d, %d)\n", matrix->rows, matrix->columns);

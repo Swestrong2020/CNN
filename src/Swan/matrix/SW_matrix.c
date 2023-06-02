@@ -48,7 +48,7 @@ void SWM_multiplyMatrixD(SWM_Matrix *a, SWM_Matrix *b, SWM_Matrix *dest)
     for (uint32_t j = 0, lj = b->columns; j < lj; j++)
     for (uint32_t k = 0, lk = b->rows; k < lk; k++)
     {
-        dest->data[SWM_index(dest, i, j)] += SWM_at(a, i, k) * SWM_at(b, k, j);
+        dest->data[SWM_index(dest, i, j)] = SWM_at(a, i, k) * SWM_at(b, k, j);
     }
 }
 

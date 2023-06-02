@@ -294,7 +294,7 @@ SWM_Matrix SW_ExecuteNetwork(SW_Network *network, SWM_Matrix *input)
         SWM_printm(&currentLayer->biases);
 
         SWM_Matrix tempOut = SWM_multiplyMatrix(&currentOutput, &currentLayer->weights);
-        // SWM_addMatrixD(&tempOut, &currentLayer->biases, &tempOut);
+        SWM_addMatrixD(&tempOut, &currentLayer->biases, &tempOut);
 
         printf("before activation function\n");
         SWM_printm(&tempOut);

@@ -31,14 +31,14 @@ void SW_AddNetworkLayer(SW_Network *network, uint32_t neuronAmount, SW_Activatio
         exit(1);
     }
 
+    uint32_t previouslayerNeurons = (network->layerAmount == 0) ? network->inputNeurons : network->layers[network->layerAmount-1].weights.columns;
+    
     network->layers = realloc(network->layers, (++network->layerAmount) * sizeof(SW_Layer));
     if (network->layers == NULL)
     {
         fputs("Oopsie during layer allocation :(\n", stderr);
         exit(1);
     }
-
-    uint32_t previouslayerNeurons = (network->layerAmount == 0) ? network->inputNeurons : network->layers[network->layerAmount-1].weights.columns;
 
     SW_Layer *currentLayer = &network->layers[network->layerAmount-1];
 
@@ -47,7 +47,7 @@ void SW_AddNetworkLayer(SW_Network *network, uint32_t neuronAmount, SW_Activatio
     // create a new matrix with neuronAmount rows, where each column holds weights for 
     // every neuron in the previous layer
 
-    SWM_initMatrix(&currentLayer->weights, network->inputNeurons, neuronAmount);
+    SWM_initMatrix(&currentLayer->weights, previouslayerNeurons, neuronAmount);
     SWM_initMatrix(&currentLayer->biases, 1, neuronAmount);
 
     SWM_fillMatrix(&currentLayer->weights, .0f);
@@ -267,7 +267,7 @@ void SW_RandomizeNetwork(SW_Network *network)
 //     }
 // }
 
-void SW_ExecuteNetwork(SW_Network *network, SWM_Matrix *input)
+SWM_Matrix SW_ExecuteNetwork(SW_Network *network, SWM_Matrix *input)
 {
     if (network->layerAmount == 0)
     {
@@ -281,15 +281,50 @@ void SW_ExecuteNetwork(SW_Network *network, SWM_Matrix *input)
     SWM_initMatrix(&currentOutput, input->rows, input->columns);
     memcpy(currentOutput.data, input->data, sizeof(SWM_MatrixValue_t) * input->rows * input->columns);
 
-    SWM_printm(&currentOutput);
-    SWM_printm(input);
+    for (int i = 0; i < network->layerAmount; i++)
+    {
+        printf("current input: \n");
+        SWM_printm(&currentOutput);
 
-    // for (int i = 0; i < network->layerAmount; i++)
-    // {
-    //     currentLayer = &network->layers[i];
+        currentLayer = &network->layers[i];
 
+        printf("weights: \n");
+        SWM_printm(&currentLayer->weights);
+        printf("biases: \n");
+        SWM_printm(&currentLayer->biases);
 
-    // }
+        SWM_Matrix tempOut = SWM_multiplyMatrix(&currentOutput, &currentLayer->weights);
+        // SWM_addMatrixD(&tempOut, &currentLayer->biases, &tempOut);
+
+        printf("before activation function\n");
+        SWM_printm(&tempOut);
+
+        // apply activation function
+        switch (currentLayer->activationFunction)
+        {
+            case SW_ACTIVATION_FUNCTION_RELU:
+                SWM_applyFunction(&tempOut, &SW_ReLu);
+                break;
+            case SW_ACTIVATION_FUNCTION_SIGMOID:
+                SWM_applyFunction(&tempOut, &SW_Sigmoid);
+                break;
+            case SW_ACTIVATION_FUNCTION_TANH:
+                SWM_applyFunction(&tempOut, &SW_Tanh);
+                break;
+            case SW_ACTIVATION_FUNCTION_SOFTMAX:
+                break;
+        }
+
+        printf("after activation functions: \n");
+        SWM_printm(&tempOut);
+
+        SWM_destroyMatrix(&currentOutput);
+        currentOutput = tempOut;
+
+        printf("next layer\n\n");
+    }
+
+    return currentOutput;
 }
 
 // void SW_ExucuteNetwork(SW_Network *network)

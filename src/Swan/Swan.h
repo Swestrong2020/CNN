@@ -4,9 +4,9 @@
 // All the things related to Swan
 // Everything part of Swan is prefixed with SW_
 
+#include "SW_util.h"
 #include "SW_matrix.h"
 #include "SW_types.h"
 #include "SW_network.h"
-#include "SW_util.h"
 
 #endif // SWAN_H

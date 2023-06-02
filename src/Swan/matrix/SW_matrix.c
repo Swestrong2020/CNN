@@ -7,20 +7,20 @@
 
 // matrix operations
 
-void SWM_addMatrix(SWM_Matrix *a, SWM_Matrix *b, SWM_Matrix *dest)
+void SWM_addMatrixD(SWM_Matrix *a, SWM_Matrix *b, SWM_Matrix *dest)
 {
     if (dest->rows != a->rows || dest->columns != a->columns)
     {
         fputs("Destination matrix not of the right size\n", stderr);
-        exit(1);
+        abort();
     }
 
     // safety guards
     if (a->rows != b->rows || a->columns != b->columns)
     {
-        fputs("Failed to add differently sized matrices", stderr);
+        fputs("Failed to add differently sized matrices\n", stderr);
 
-        exit(1);
+        abort();
     }
 
     for (uint32_t i = 0, l = dest->rows; i < l; i++)
@@ -28,18 +28,18 @@ void SWM_addMatrix(SWM_Matrix *a, SWM_Matrix *b, SWM_Matrix *dest)
         SWM_set(dest, i, j, SWM_at(a, i, j) + SWM_at(b, i, j));
 }
 
-void SWM_multiplyMatrix(SWM_Matrix *a, SWM_Matrix *b, SWM_Matrix *dest)
+void SWM_multiplyMatrixD(SWM_Matrix *a, SWM_Matrix *b, SWM_Matrix *dest)
 {
     if (dest->rows != a->rows || dest->columns != b->columns)
     {
         fputs("Destination matrix not of the right size\n", stderr);
-        exit(1);
+        abort();
     }
 
     if (a->columns != b->rows)
     {
         fputs("Error multiplying two matrices of different sizes\n", stderr);
-        exit(1);
+        abort();
     }
 
     // iterate and multiply
@@ -52,7 +52,7 @@ void SWM_multiplyMatrix(SWM_Matrix *a, SWM_Matrix *b, SWM_Matrix *dest)
     }
 }
 
-void SWM_multiplyScalar(SWM_Matrix *a, float scalar, SWM_Matrix *dest)
+void SWM_multiplyScalarD(SWM_Matrix *a, float scalar, SWM_Matrix *dest)
 {
     // multiply all values by scalar
     for (uint32_t i = 0, l = a->rows; i < l; i++)
@@ -67,7 +67,7 @@ void SWM_printm(SWM_Matrix *matrix)
 {
     if (matrix->rows == 0 || matrix->columns == 0)
     {
-        fputs("Not printing empty matrix >:(", stderr);
+        fputs("Not printing empty matrix >:(\n", stderr);
     }
     
     fprintf(stdout, "(%d, %d)\n", matrix->rows, matrix->columns);

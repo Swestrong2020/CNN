@@ -143,28 +143,37 @@
 // }
 
 #include <stdio.h>
+#include <time.h>
 
-#include "SW_matrix.h"
 #include "Swan.h"
 
 int main(void)
 {
+    srand(time(NULL));
+
     SW_Network network;
     SW_InitNetwork(&network, 4);
-    SW_AddNetworkLayer(&network, 8, SW_ACTIVATION_FUNCTION_RELU);
+    SW_AddNetworkLayer(&network, 2, SW_ACTIVATION_FUNCTION_RELU);
+    SW_AddNetworkLayer(&network, 2, SW_ACTIVATION_FUNCTION_RELU);
+    SW_AddNetworkLayer(&network, 1, SW_ACTIVATION_FUNCTION_SIGMOID);
+
+    // SW_RandomizeNetwork(&network);
 
     SWM_Matrix inputMatrix;
-    SWM_initMatrix(&inputMatrix, 1, 5);
-    SWM_set(&inputMatrix, 0, 0, 0.0f);    
-    SWM_set(&inputMatrix, 0, 1, 5.0f);
-    SWM_set(&inputMatrix, 0, 2, 32.0f);
+    SWM_initMatrix(&inputMatrix, 1, 4);
+    SWM_set(&inputMatrix, 0, 0, 0.79f);
+    SWM_set(&inputMatrix, 0, 1, 0.53f);
+    SWM_set(&inputMatrix, 0, 2, 0.112f);
     SWM_set(&inputMatrix, 0, 3, 0.22f);
-    SWM_set(&inputMatrix, 0, 4, 0.5f);
 
+    SWM_Matrix out = SW_ExecuteNetwork(&network, &inputMatrix);
 
-    SW_ExucuteNetwork(&network, inputMatrix);
+    SWM_printm(&out);
 
     SW_UnloadNetwork(&network);
 
+    SWM_destroyMatrix(&out);
+    SWM_destroyMatrix(&inputMatrix);
+    
     return 0;
 }

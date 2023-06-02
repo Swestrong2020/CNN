@@ -283,21 +283,10 @@ SWM_Matrix SW_ExecuteNetwork(SW_Network *network, SWM_Matrix *input)
 
     for (int i = 0; i < network->layerAmount; i++)
     {
-        printf("current input: \n");
-        SWM_printm(&currentOutput);
-
         currentLayer = &network->layers[i];
-
-        printf("weights: \n");
-        SWM_printm(&currentLayer->weights);
-        printf("biases: \n");
-        SWM_printm(&currentLayer->biases);
 
         SWM_Matrix tempOut = SWM_multiplyMatrix(&currentOutput, &currentLayer->weights);
         SWM_addMatrixD(&tempOut, &currentLayer->biases, &tempOut);
-
-        printf("before activation function\n");
-        SWM_printm(&tempOut);
 
         // apply activation function
         switch (currentLayer->activationFunction)
@@ -315,13 +304,8 @@ SWM_Matrix SW_ExecuteNetwork(SW_Network *network, SWM_Matrix *input)
                 break;
         }
 
-        printf("after activation functions: \n");
-        SWM_printm(&tempOut);
-
         SWM_destroyMatrix(&currentOutput);
         currentOutput = tempOut;
-
-        printf("next layer\n\n");
     }
 
     return currentOutput;

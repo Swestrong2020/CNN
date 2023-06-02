@@ -142,55 +142,51 @@
 //     return 0;
 // }
 
-// #include <stdio.h>
-// #include <time.h>
-
-// #include "Swan.h"
-
-// int main(void)
-// {
-//     srand(time(NULL));
-
-//     SW_Network network;
-//     SW_InitNetwork(&network, 2);
-//     SW_AddNetworkLayer(&network, 8, SW_ACTIVATION_FUNCTION_TANH);
-//     SW_AddNetworkLayer(&network, 8, SW_ACTIVATION_FUNCTION_TANH);
-//     SW_AddNetworkLayer(&network, 1, SW_ACTIVATION_FUNCTION_SIGMOID);
-
-//     SW_RandomizeNetwork(&network);
-
-//     SWM_Matrix inputMatrix;
-//     SWM_initMatrix(&inputMatrix, 1, 2);
-//     SWM_set(&inputMatrix, 0, 0, 0.5f);
-//     SWM_set(&inputMatrix, 0, 1, 0.25f);
-//     // SWM_set(&inputMatrix, 0, 2, 0.112f);
-//     // SWM_set(&inputMatrix, 0, 3, 0.22f);
-
-//     SWM_Matrix out = SW_ExecuteNetwork(&network, &inputMatrix);
-
-//     SWM_printm(&out);
-
-//     SW_UnloadNetwork(&network);
-
-//     SWM_destroyMatrix(&out);
-//     SWM_destroyMatrix(&inputMatrix);
-
-//     return 0;
-// }
-
 #include <stdio.h>
-#include <stdlib.h>
 #include <time.h>
 
-#include <Swan.h>
-
-SWM_Matrix* parseDataSet()
-{
-    FILE *MNISTLabelFile = fopen("MNISTdataset/train-labels-idx1-ubyte", "rb");
-    
-}
+#include "Swan.h"
 
 int main(void)
 {
     srand(time(NULL));
+
+    SW_Network network;
+    SW_InitNetwork(&network, 2);
+    SW_AddNetworkLayer(&network, 8, SW_ACTIVATION_FUNCTION_TANH);
+    SW_AddNetworkLayer(&network, 8, SW_ACTIVATION_FUNCTION_TANH);
+    SW_AddNetworkLayer(&network, 10, SW_ACTIVATION_FUNCTION_SIGMOID);
+
+    SW_RandomizeNetwork(&network);
+
+    SWM_Matrix inputMatrix;
+    SWM_initMatrix(&inputMatrix, 1, 2);
+    SWM_set(&inputMatrix, 0, 0, 0.5f);
+    SWM_set(&inputMatrix, 0, 1, 0.25f);
+    // SWM_set(&inputMatrix, 0, 2, 0.112f);
+    // SWM_set(&inputMatrix, 0, 3, 0.22f);
+
+    SWM_Matrix out = SW_ExecuteNetwork(&network, &inputMatrix);
+
+    SWM_printm(&out);
+
+    SW_UnloadNetwork(&network);
+
+    SWM_destroyMatrix(&out);
+    SWM_destroyMatrix(&inputMatrix);
+
+    return 0;
 }
+
+// #include <stdio.h>
+// #include <stdlib.h>
+// #include <time.h>
+
+// #include <Swan.h>
+
+// SWM_Matrix *parseLabels()
+
+// int main(void)
+// {
+//     srand(time(NULL));
+// }

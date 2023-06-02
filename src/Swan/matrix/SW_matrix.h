@@ -65,18 +65,11 @@ void SWM_fillMatrix(SWM_Matrix *matrix, float scalar)
         matrix->data[i] = scalar;
 }
 
-SWM_MatrixData_t SWM_copyMatrixData(SWM_Matrix *matrix) /* ret freed by caller */
-{
-    SWM_MatrixData_t data = SWM_createData(matrix->rows, matrix->columns);
-    memcpy(data, matrix->data, matrix->columns * matrix->rows * sizeof(SWM_MatrixValue_t));
-    return data;
-}
-
 // matrix operations
 
-SWM_Matrix SWM_addMatrix(SWM_Matrix *a, SWM_Matrix *b); /* ret freed by caller */
-SWM_Matrix SWM_multiplyMatrix(SWM_Matrix *a, SWM_Matrix *b); /* ret freed by caller */
-SWM_Matrix SWM_multiplyScalar(SWM_Matrix *a, SWM_MatrixValue_t scalar); /* ret freed by caller */
+void SWM_addMatrix(SWM_Matrix *a, SWM_Matrix *b, SWM_Matrix *dest);
+void SWM_multiplyMatrix(SWM_Matrix *a, SWM_Matrix *b, SWM_Matrix *dest); /* ret freed by caller */
+void SWM_multiplyScalar(SWM_Matrix *a, float scalar, SWM_Matrix *dest); /* ret freed by caller */
 
 // util
 

@@ -267,7 +267,30 @@ void SW_RandomizeNetwork(SW_Network *network)
 //     }
 // }
 
-void SW_ExecuteNetwork(SW_Network *network, SWM_Matrix input);
+void SW_ExecuteNetwork(SW_Network *network, SWM_Matrix *input)
+{
+    if (network->layerAmount == 0)
+    {
+        fputs("Not executing empty network\n", stderr);
+        exit(1);
+    }
+
+    SW_Layer *currentLayer;
+    SWM_Matrix currentOutput;
+
+    SWM_initMatrix(&currentOutput, input->rows, input->columns);
+    memcpy(currentOutput.data, input->data, sizeof(SWM_MatrixValue_t) * input->rows * input->columns);
+
+    SWM_printm(&currentOutput);
+    SWM_printm(input);
+
+    // for (int i = 0; i < network->layerAmount; i++)
+    // {
+    //     currentLayer = &network->layers[i];
+
+
+    // }
+}
 
 // void SW_ExucuteNetwork(SW_Network *network)
 // {

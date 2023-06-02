@@ -7,8 +7,14 @@
 
 // matrix operations
 
-SWM_Matrix SWM_addMatrix(SWM_Matrix *a, SWM_Matrix *b)
+void SWM_addMatrix(SWM_Matrix *a, SWM_Matrix *b, SWM_Matrix *dest)
 {
+    if (dest->rows != a->rows || dest->columns != a->columns)
+    {
+        fputs("Destination matrix not of the right size\n", stderr);
+        exit(1);
+    }
+
     // safety guards
     if (a->rows != b->rows || a->columns != b->columns)
     {
@@ -17,28 +23,24 @@ SWM_Matrix SWM_addMatrix(SWM_Matrix *a, SWM_Matrix *b)
         exit(1);
     }
 
-    SWM_MatrixData_t outputData = SWM_createData(a->rows, a->columns);
-    SWM_Matrix out;
-    SWM_initMatrixData(&out, a->rows, a->columns, outputData);
-
-    for (uint32_t i = 0, l = a->rows; i < l; i++)
-    for (uint32_t j = 0, k = a->columns; j < k; j++)
-        SWM_set(&out, i, j, SWM_at(a, i, j) + SWM_at(b, i, j));
-
-    return out;
+    for (uint32_t i = 0, l = dest->rows; i < l; i++)
+    for (uint32_t j = 0, k = dest->columns; j < k; j++)
+        SWM_set(dest, i, j, SWM_at(a, i, j) + SWM_at(b, i, j));
 }
 
-SWM_Matrix SWM_multiplyMatrix(SWM_Matrix *a, SWM_Matrix *b)
+void SWM_multiplyMatrix(SWM_Matrix *a, SWM_Matrix *b, SWM_Matrix *dest)
 {
+    if (dest->rows != a->rows || dest->columns != b->columns)
+    {
+        fputs("Destination matrix not of the right size\n", stderr);
+        exit(1);
+    }
+
     if (a->columns != b->rows)
     {
         fputs("Error multiplying two matrices of different sizes\n", stderr);
         exit(1);
     }
-
-    // create output matrix
-    SWM_Matrix out;
-    SWM_initMatrix(&out, a->rows, b->columns);
 
     // iterate and multiply
     // SLOW METHOD DAYUM
@@ -46,24 +48,16 @@ SWM_Matrix SWM_multiplyMatrix(SWM_Matrix *a, SWM_Matrix *b)
     for (uint32_t j = 0, lj = b->columns; j < lj; j++)
     for (uint32_t k = 0, lk = b->rows; k < lk; k++)
     {
-        out.data[SWM_index(&out, i, j)] += SWM_at(a, i, k) * SWM_at(b, k, j);
+        dest->data[SWM_index(dest, i, j)] += SWM_at(a, i, k) * SWM_at(b, k, j);
     }
-
-    return out;
 }
 
-SWM_Matrix SWM_multiplyScalar(SWM_Matrix *a, float scalar)
+void SWM_multiplyScalar(SWM_Matrix *a, float scalar, SWM_Matrix *dest)
 {
-    // create output matrix with data of a
-    SWM_Matrix out;
-    SWM_initMatrixData(&out, a->rows, a->columns, SWM_copyMatrixData(a));
-
     // multiply all values by scalar
     for (uint32_t i = 0, l = a->rows; i < l; i++)
     for (uint32_t j = 0, k = a->columns; j < k; j++)
-        SWM_set(&out, i, j, SWM_at(&out, i, j) * scalar);
-
-    return out;
+        SWM_set(dest, i, j, SWM_at(a, i, j) * scalar);
 }
 
 

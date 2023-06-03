@@ -8,5 +8,6 @@
 #include "SW_matrix.h"
 #include "SW_types.h"
 #include "SW_network.h"
+#include "SW_parse.h"
 
 #endif // SWAN_H

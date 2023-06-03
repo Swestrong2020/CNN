@@ -4,6 +4,7 @@ add_subdirectory(matrix)
 
 add_library(swan STATIC
     SW_network.c
+    SW_parse.c
 )
 
 target_include_directories(swan PUBLIC ./)

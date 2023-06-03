@@ -9,7 +9,7 @@
 #define DEBUG
 
 // https://codereview.stackexchange.com/questions/151049/endianness-conversion-in-c
-static inline uint32_t reverse32(uint32_t value) 
+static inline uint32_t reverse32(uint32_t value)
 {
     return (((value & 0x000000FF) << 24) | ((value & 0x0000FF00) <<  8) | ((value & 0x00FF0000) >>  8) | ((value & 0xFF000000) >> 24));
 }
@@ -26,18 +26,21 @@ static inline uint32_t freadReverse32(FILE *stream)
 
 const char lightValues[10] = { ' ', '.', ':', '-', '=', '+', '*', '#', '%', '@' };
 
-void SW_printMNISTImage(uint8_t *pointer, int32_t rows, int32_t columns)
+void SW_printMNISTImage(float *pointer)
 {
-    uint32_t buflen = rows*columns+rows+8;
+    // add rows for newline character, add 8 just for some buffer leeway
+    uint32_t buflen = MNISTIMAGESIZE*MNISTIMAGESIZE+MNISTIMAGESIZE+8;
+
     char output[buflen];
 
     uint32_t index = 0, outIndex = 0;
 
-    for (uint32_t i = 0; i < rows; i++)
+    for (uint32_t i = 0; i < MNISTIMAGESIZE; i++)
     {
-        for (uint32_t j = 0; j < columns; j++)
+        for (uint32_t j = 0; j < MNISTIMAGESIZE; j++)
         {
-            uint8_t lightval = (uint8_t)round((float)((float)pointer[index++]/(float)UINT8_MAX) * 10.0f);
+            // image data is already normalized
+            uint32_t lightval = (uint32_t)round(pointer[index++] * 10.0f);
 
             if (lightval > 9) lightval = 9;
 
@@ -56,7 +59,7 @@ void SW_printMNISTImage(uint8_t *pointer, int32_t rows, int32_t columns)
 
 void SW_parseMNIST(
     uint32_t *_nTrainingLabels, uint32_t *_nTrainingImages, uint32_t *_nTestLabels, uint32_t *_nTestImages,
-    uint8_t **_trainingLabels, uint8_t **_trainingImages, uint8_t **_testLabels, uint8_t **_testImages
+    uint8_t **_trainingLabels, float **_trainingImages, uint8_t **_testLabels, float **_testImages
 )
 {
 
@@ -207,14 +210,61 @@ void SW_parseMNIST(
     (*_nTestLabels) = nTestLabels;
     (*_nTestImages) = nTestImages;
     
-    (*_testLabels) = testLabels;
-    (*_testImages) = testImages;
     (*_trainingLabels) = trainingLabels;
-    (*_trainingImages) = trainingImages;
+    (*_testLabels) = testLabels;
+
+
+    // normalize image data: uint8_t(0...255) to float(0...1)
+
+    float *trainingImagesNormalized = malloc(sizeof(float) * nTrainingImages * trainingImagesRows * trainingImagesColumns);
+    if (trainingImagesNormalized == NULL)
+    {
+        fputs("memory error while converting image data type\n", stderr);
+        abort();
+    }
+
+    for (uint32_t i = 0, l = nTrainingImages * trainingImagesRows * trainingImagesColumns; i < l; i++)
+    {
+        uint8_t pixelData = trainingImages[i];
+        trainingImagesNormalized[i] = (float)pixelData / 255.0f;
+    }
+
+    free(trainingImages);
+
+    (*_trainingImages) = trainingImagesNormalized;
+
+#ifdef DEBUG
+    printf("converted %d uint8_t to float in trainingImages\n", nTrainingImages);
+#endif
+
+
+
+    float *testImagesNormalized = malloc(sizeof(float) * nTestImages * testImagesRows * testImagesColumns);
+    if (testImagesNormalized == NULL)
+    {
+        fputs("memory error while converting image data type\n", stderr);
+        abort();
+    }
+
+    for (uint32_t i = 0, l = nTestImages * testImagesRows * testImagesColumns; i < l; i++)
+    {
+        uint8_t pixelData = testImages[i];
+        testImagesNormalized[i] = (float)pixelData / 255.0f;
+    }
+
+#ifdef DEBUG
+    printf("converted %d uint8_t to float in testImages\n", nTestImages);
+#endif
+
+    free(testImages);
+
+    (*_testImages) = testImagesNormalized;
 }
 
-SWM_Matrix SW_MNISTImageToMatrix(uint8_t *imagePointer, int32_t rows, int32_t columns)
+SWM_Matrix SW_MNISTImageToMatrix(float *imagePointer)
 {
     SWM_Matrix out;
-    SWM_initMatrix(&out, rows, columns);
+    SWM_initMatrix(&out, 1, MNISTIMAGESIZE*MNISTIMAGESIZE);
+    memcpy(out.data, imagePointer, sizeof(float) * MNISTIMAGESIZE * MNISTIMAGESIZE);
+    return out;
 }

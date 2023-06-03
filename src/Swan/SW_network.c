@@ -28,7 +28,7 @@ void SW_AddNetworkLayer(SW_Network *network, uint32_t neuronAmount, SW_Activatio
     if (neuronAmount == 0)
     {
         fputs("WHAT'S THE POINT OF A NEURAL NETWORK IF IT LITERALLY HAS NO BRAIN? IS IT INSPIRED BY YOURSELF?", stderr);
-        exit(1);
+        abort();
     }
 
     uint32_t previouslayerNeurons = (network->layerAmount == 0) ? network->inputNeurons : network->layers[network->layerAmount-1].weights.columns;
@@ -37,7 +37,7 @@ void SW_AddNetworkLayer(SW_Network *network, uint32_t neuronAmount, SW_Activatio
     if (network->layers == NULL)
     {
         fputs("Oopsie during layer allocation :(\n", stderr);
-        exit(1);
+        abort();
     }
 
     SW_Layer *currentLayer = &network->layers[network->layerAmount-1];
@@ -272,7 +272,7 @@ SWM_Matrix SW_ExecuteNetwork(SW_Network *network, SWM_Matrix *input)
     if (network->layerAmount == 0)
     {
         fputs("Not executing empty network\n", stderr);
-        exit(1);
+        abort();
     }
 
     SW_Layer *currentLayer;

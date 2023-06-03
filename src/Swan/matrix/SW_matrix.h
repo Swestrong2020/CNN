@@ -13,7 +13,7 @@ typedef SWM_MatrixValue_t* SWM_MatrixData_t;
 typedef struct SWM_Matrix
 {
 
-    SWM_MatrixData_t data;
+    SWM_MatrixData_t data; /* stored row-wise continuously in memory*/
     uint32_t rows, columns;
 
 } SWM_Matrix;

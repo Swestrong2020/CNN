@@ -10,34 +10,12 @@ int main(void)
 {
     srand(time(NULL));
 
-    int32_t nTrainingLabels = 0, nTrainingImages = 0, nTestLabels = 0, nTestImages = 0;
-    uint8_t *trainingLabels = NULL, *testLabels = NULL;
-    float *testImages = NULL, *trainingImages = NULL;
+    SW_MNISTData_t trainingData = {.images = NULL, .labels = NULL};
+    SW_MNISTData_t testData = {.images = NULL, .labels = NULL};
 
     SW_parseMNIST(
-        &nTrainingLabels, &nTrainingImages, &nTestLabels, &nTestImages,
-        &trainingLabels, &trainingImages, &testLabels, &testImages
+        &trainingData, &testData
     );
-
-    printf("First 2 images of training set:\n");
-    float *trainingpointer = trainingImages;
-
-    for (uint32_t i = 0; i < 2; i++)
-    {
-        printf("should be: %d\n", trainingLabels[i]);
-        SW_printMNISTImage(trainingpointer);
-        trainingpointer += (MNISTIMAGESIZE * MNISTIMAGESIZE);
-    }
-
-    printf("First 2 images of test set:\n");
-    float *testpointer = testImages;
-    for (uint32_t i = 0; i < 2; i++)
-    {
-        printf("should be: %d\n", testLabels[i]);
-        SW_printMNISTImage(testpointer);
-        testpointer += (MNISTIMAGESIZE * MNISTIMAGESIZE);
-    }
-
 
 
     // now only the neural network part :/
@@ -51,8 +29,14 @@ int main(void)
 
     SW_RandomizeNetwork(&network);
 
+    printf("first image of training set (should be %d):\n", trainingData.labels[0]);
+    SW_printMNISTImage(trainingData.images);
+
+    printf("first image of test set (should be %d):\n", testData.labels[0]);
+    SW_printMNISTImage(testData.images);
+
     // temp first image of training set
-    SWM_Matrix inputMatrix = SW_MNISTImageToMatrix(trainingImages);
+    SWM_Matrix inputMatrix = SW_MNISTImageToMatrix(trainingData.images);
 
     SWM_Matrix outputMatrix = SW_ExecuteNetwork(&network, &inputMatrix);
 
@@ -64,10 +48,8 @@ int main(void)
 
     SW_UnloadNetwork(&network);
 
-    free(testImages);
-    free(trainingImages);
-    free(testLabels);
-    free(trainingLabels);
+    SW_unloadMNIST(&trainingData);
+    SW_unloadMNIST(&testData);
 
     return 0;
 }

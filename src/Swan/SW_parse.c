@@ -73,12 +73,6 @@ void parseMNISTLabels(SW_MNISTData_t *data, const char *fileName)
     int32_t trainingLabelsMagicBytes;
     trainingLabelsMagicBytes = (int32_t)freadReverse32(fTrainingLabels);
 
-    if (trainingLabelsMagicBytes != 2049 && trainingLabelsMagicBytes != 17301504)
-    {
-        fputs("training labels corrupted\n", stderr);
-        abort();
-    }
-
     data->nLabels = (int32_t)freadReverse32(fTrainingLabels);
 
     data->labels = realloc(data->labels, sizeof(uint8_t) * data->nLabels);
@@ -92,7 +86,7 @@ void parseMNISTLabels(SW_MNISTData_t *data, const char *fileName)
     size_t trainingLabelsNRead = fread(data->labels, sizeof(uint8_t), data->nLabels, fTrainingLabels);
     
 #ifdef DEBUG
-    printf("read %zu bytes into trainingLabels\n", trainingLabelsNRead);
+    printf("read %zu values into trainingLabels\n", trainingLabelsNRead);
 #endif
 
     fclose(fTrainingLabels);
@@ -112,16 +106,10 @@ void parseMNISTImages(SW_MNISTData_t *data, const char *fileName)
     int32_t trainingImagesMagicBytes;
     trainingImagesMagicBytes = (int32_t)freadReverse32(fTrainingImages);
 
-    if (trainingImagesMagicBytes != 2051 && trainingImagesMagicBytes != 50855936)
-    {
-        fputs("training images corrupted\n", stderr);
-        abort();
-    }
-
     // these two contain the image dimensions, but since those are constant we just discard those
-    freadReverse32(fTrainingImages);
-    freadReverse32(fTrainingImages);
     data->nImages = (int32_t)freadReverse32(fTrainingImages);
+    freadReverse32(fTrainingImages);
+    freadReverse32(fTrainingImages);
 
     // parse uint8_t (0...255) to float (0...1)
     
@@ -146,7 +134,7 @@ void parseMNISTImages(SW_MNISTData_t *data, const char *fileName)
     }
 
 #ifdef DEBUG
-    printf("read %zu images into trainingImages\n", trainingImagesRead);
+    printf("read %zu pixels into trainingImages\n", trainingImagesRead);
 #endif
 
     fclose(fTrainingImages);

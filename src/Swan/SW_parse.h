@@ -10,7 +10,8 @@
 typedef struct SW_MNISTData_t
 {
     uint32_t nLabels, nImages;
-    float *labels, *images;
+    uint8_t *labels;
+    float *images;
 } SW_MNISTData_t;
 
 /* parses the *entire* mnist data set *into* function arguments. Normalizes pixel data (0...255 -> 0...1)*/

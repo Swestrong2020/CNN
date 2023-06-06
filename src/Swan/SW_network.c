@@ -9,6 +9,7 @@
 #include "SW_types.h"
 #include "SW_util.h"
 #include "SW_matrix.h"
+#include "SW_parse.h"
 
 void SW_InitNetwork(SW_Network *network, uint32_t inputNeurons)
 {
@@ -153,11 +154,17 @@ void SW_RandomizeNetwork(SW_Network *network)
     }
 }
 
-SWM_Matrix SW_ExecuteNetwork(SW_Network *network, SWM_Matrix *input)
+void SW_ExecuteNetwork(SW_Network *network, SWM_Matrix *input, SWM_Matrix *dest)
 {
     if (network->layerAmount == 0)
     {
         fputs("Not executing empty network\n", stderr);
+        abort();
+    }
+
+    if (dest->rows != 1 || dest->columns != network->layers[network->layerAmount-1].weights.columns)
+    {
+        fputs("destination matrix should be of size (1, output neuron amount) where (row, column)\n", stderr);
         abort();
     }
 
@@ -194,59 +201,27 @@ SWM_Matrix SW_ExecuteNetwork(SW_Network *network, SWM_Matrix *input)
         currentOutput = tempOut;
     }
 
-    return currentOutput;
+    memcpy(dest->data, currentOutput.data, sizeof(float) * currentOutput.rows * currentOutput.columns);
+    SWM_destroyMatrix(&currentOutput);
 }
 
-// void SW_ExucuteNetwork(SW_Network *network)
-// {
-//     if (network->layerAmount <= 2)
-//     {
-//         fputs("You can't execute a network without any layers, stupid", stderr);
-//         return;
-//     }
+/* alters neural network weights and biases*/
+void networkTrainingIteration(SW_Network *network, SWM_Matrix *input, uint8_t correctOutput, SWM_Matrix *outputCache, SW_LossFunction lossFunction)
+{
+    SW_ExecuteNetwork(network, input, outputCache);
+}
 
-//     // Calculate the output for each neuron in each layer
-//     for (uint32_t i = 1; i < network->layerAmount; i++)
-//     {
-//         SW_Layer *PreviousLayer = &network->layers[i - 1];
-//         SW_Layer *CurrentLayer = &network->layers[i];
+void SW_TrainNetworkMNIST(SW_Network *network, SW_MNISTData_t *trainingData, uint32_t epochs, float learningRate, SW_LossFunction lossFunction)
+{
+    SWM_Matrix networkOutputCache;
+    SWM_initMatrix(&networkOutputCache, 1, network->layers[network->layerAmount-1].weights.columns);
 
-//         for (uint32_t j = 0; j < CurrentLayer->neuronAmount; j++)
-//         {
-//             float input = 0.0f;
 
-//             for (uint32_t k = 0; k < PreviousLayer->neuronAmount; k++)
-//                 input += PreviousLayer->neurons[k].output * CurrentLayer->neurons[j].weights[k];
-            
-//             input += CurrentLayer->neurons[j].bias;
-  
-//             // The activation function ReLU (Rectified linear)
-//             switch (CurrentLayer->activationFunction)
-//             {
-//             case SW_ACTIVATION_FUNCTION_RELU:
-//                 CurrentLayer->neurons[j].output = SW_ReLu(input);
-//                 break;
 
-//             case SW_ACTIVATION_FUNCTION_SOFTMAX:
-//                 // unimplemented
-//                 break;
 
-//             case SW_ACTIVATION_FUNCTION_SIGMOID:
-//                 CurrentLayer->neurons[j].output = SW_Sigmoid(input);
-//                 break;
 
-//             case SW_ACTIVATION_FUNCTION_TANH:
-//                 CurrentLayer->neurons[j].output = SW_Tanh(input);
-//                 break;
-
-//             default:
-//                 fputs("OH GOD YOU HAVE NO ACTIVATION FUNCTION WHAT HAVE YOU DONE", stderr);
-//                 CurrentLayer->neurons[j].output = 0.0f;
-//                 break;
-//             }
-//         }
-//     }
-// }
+    SWM_destroyMatrix(&networkOutputCache);
+}
 
 // float SW_CalculateLoss(SW_Network *network, SW_LossFunction lossFunction, float *input, float *correctOutput)
 // {      

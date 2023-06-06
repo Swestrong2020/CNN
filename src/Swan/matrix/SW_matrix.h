@@ -23,9 +23,14 @@ static inline uint32_t SWM_index(SWM_Matrix *matrix, uint32_t row, uint32_t col)
     return (row * matrix->columns + col);
 }
 
-static inline SWM_MatrixValue_t SWM_at(SWM_Matrix *matrix, uint32_t row, uint32_t col)
+static inline SWM_MatrixValue_t SWM_get(SWM_Matrix *matrix, uint32_t row, uint32_t col)
 {
     return matrix->data[SWM_index(matrix, row, col)];
+}
+
+static inline SWM_MatrixValue_t *SWM_at(SWM_Matrix *matrix, uint32_t row, uint32_t col)
+{
+    return &matrix->data[SWM_index(matrix, row, col)];
 }
 
 static inline void SWM_set(SWM_Matrix *matrix, uint32_t row, uint32_t column, SWM_MatrixValue_t value)
@@ -70,6 +75,7 @@ static inline void SWM_fillMatrix(SWM_Matrix *matrix, float scalar)
 void SWM_addMatrixD(SWM_Matrix *a, SWM_Matrix *b, SWM_Matrix *dest);
 void SWM_multiplyMatrixD(SWM_Matrix *a, SWM_Matrix *b, SWM_Matrix *dest);
 void SWM_multiplyScalarD(SWM_Matrix *a, float scalar, SWM_Matrix *dest);
+void SWM_transposeD(SWM_Matrix *a, SWM_Matrix *dest);
 
 static inline SWM_Matrix SWM_addMatrix(SWM_Matrix *a, SWM_Matrix *b)
 {
@@ -92,6 +98,14 @@ static inline SWM_Matrix SWM_multiplyScalar(SWM_Matrix *a, float scalar)
     SWM_Matrix out;
     SWM_initMatrix(&out, a->rows, a->columns);
     SWM_multiplyScalarD(a, scalar, &out);
+    return out;
+}
+
+static inline SWM_Matrix SWM_transpose(SWM_Matrix *a)
+{
+    SWM_Matrix out;
+    SWM_initMatrix(&out, a->columns, a->rows);
+    SWM_transposeD(a, &out);
     return out;
 }
 

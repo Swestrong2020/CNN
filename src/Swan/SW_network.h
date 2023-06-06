@@ -5,21 +5,18 @@
 
 #include "SW_types.h"
 #include "SW_matrix.h"
+#include "SW_parse.h"
 
 void SW_InitNetwork(SW_Network *network, uint32_t inputNeurons);
 void SW_AddNetworkLayer(SW_Network *network, uint32_t neuronAmount, SW_ActivationFunction activationFunction);
 void SW_UnloadNetwork(SW_Network *network);
-
 void SW_RandomizeNetwork(SW_Network *network);
 
-void SW_SetNetworkInput(SW_Network *network, float *input);   // input should have the same length as the first layer in the network
+void SW_ExecuteNetwork(SW_Network *network, SWM_Matrix *input, SWM_Matrix *dest);
+void SW_TrainNetworkMNIST(SW_Network *network, SW_MNISTData_t *trainingData, uint32_t epochs, float learningRate, SW_LossFunction lossFunction); /* too lazy to think about good way to generalise network input, for now just a function specific to the mnist data set. needs rethinking*/
 
-void SW_TrainNeuralNetwork(SW_Network *network, float **input, float **correctOutput, uint32_t dataAmount, uint32_t batchSize, float targetLoss, SW_LossFunction lossFunction); // input and correctOutput should be arrays of length dataAmount, each containing more arrays, for input of the size of the first layer, for correctOutput of the size of the last layer
-SWM_Matrix SW_ExecuteNetwork(SW_Network *network, SWM_Matrix *input); /* ret freed by caller */
-float SW_CalculateLoss(SW_Network *network, SW_LossFunction lossFunction, float *input, float *correctOutput); // input should have the same length as the first layer in the network, and correctOutput should have the same length as the last layer in the network
-
-void SW_SaveNetwork(SW_Network *network, char *fileName);
-void SW_LoadNetwork(SW_Network *network, char *fileName);
+void SW_SaveNetwork(SW_Network *network, const char *fileName);
+void SW_LoadNetwork(SW_Network *network, const char *fileName);
 
 #endif // SW_NETWORK_H
 

@@ -149,6 +149,7 @@ void SW_unloadMNIST(SW_MNISTData_t *data)
 
 void SW_parseMNIST(SW_MNISTData_t *trainingData, SW_MNISTData_t *testData)
 {
+    // this function totally discards magic bytes because idk
     parseMNISTImages(trainingData, "MNISTdataset/train-images-idx3-ubyte");
     parseMNISTLabels(trainingData, "MNISTdataset/train-labels-idx1-ubyte");
     parseMNISTImages(testData, "MNISTdataset/t10k-images-idx3-ubyte");

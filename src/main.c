@@ -7,11 +7,6 @@
 
 #include <Swan.h>
 
-float randtest(float v)
-{
-    return SW_randf(0, 1);
-}
-
 int main(void)
 {
     srand(time(NULL));
@@ -44,7 +39,7 @@ int main(void)
     // SWM_Matrix inputMatrix = SW_MNISTImageToMatrix(trainingData.images);
 
     // SWM_Matrix outputMatrix;
-    // SWM_initMatrix(&outputMatrix, 1, network.layers[network.layerAmount-1].weights.columns);
+    // SWM_init(&outputMatrix, 1, network.layers[network.layerAmount-1].weights.columns);
     // SW_ExecuteNetwork(&network, &inputMatrix, &outputMatrix);
 
     // printf("test network output (with first image of training set):\n");
@@ -52,6 +47,8 @@ int main(void)
 
     // SWM_destroyMatrix(&inputMatrix);
     // SWM_destroyMatrix(&outputMatrix);
+
+
 
     SW_UnloadNetwork(&network);
 

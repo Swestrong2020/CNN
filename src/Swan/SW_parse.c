@@ -61,19 +61,19 @@ void SW_printMNISTImage(float *pointer)
 void parseMNISTLabels(SW_MNISTData_t *data, const char *fileName)
 {
     // training labels
-    FILE *fTrainingLabels = fopen(fileName, "rb");
+    FILE *fLabels = fopen(fileName, "rb");
 
     // safety checks
-    if (fTrainingLabels == NULL)
+    if (fLabels == NULL)
     {
         fputs("error opening training label file\n", stderr);
         abort();
     }
 
     int32_t trainingLabelsMagicBytes;
-    trainingLabelsMagicBytes = (int32_t)freadReverse32(fTrainingLabels);
+    trainingLabelsMagicBytes = (int32_t)freadReverse32(fLabels);
 
-    data->nLabels = (int32_t)freadReverse32(fTrainingLabels);
+    data->nLabels = (int32_t)freadReverse32(fLabels);
 
     data->labels = realloc(data->labels, sizeof(uint8_t) * data->nLabels);
     
@@ -83,33 +83,33 @@ void parseMNISTLabels(SW_MNISTData_t *data, const char *fileName)
         abort();
     }
     
-    size_t trainingLabelsNRead = fread(data->labels, sizeof(uint8_t), data->nLabels, fTrainingLabels);
+    size_t trainingLabelsNRead = fread(data->labels, sizeof(uint8_t), data->nLabels, fLabels);
     
 #ifdef DEBUG
     printf("read %zu values into trainingLabels\n", trainingLabelsNRead);
 #endif
 
-    fclose(fTrainingLabels);
+    fclose(fLabels);
 }
 
 void parseMNISTImages(SW_MNISTData_t *data, const char *fileName)
 {
     // training images
-    FILE *fTrainingImages = fopen(fileName, "rb");
+    FILE *fImages = fopen(fileName, "rb");
 
-    if (fTrainingImages == NULL)
+    if (fImages == NULL)
     {
         fputs("error opening training images file\n", stderr);
         abort();
     }
 
     int32_t trainingImagesMagicBytes;
-    trainingImagesMagicBytes = (int32_t)freadReverse32(fTrainingImages);
+    trainingImagesMagicBytes = (int32_t)freadReverse32(fImages);
 
     // these two contain the image dimensions, but since those are constant we just discard those
-    data->nImages = (int32_t)freadReverse32(fTrainingImages);
-    freadReverse32(fTrainingImages);
-    freadReverse32(fTrainingImages);
+    data->nImages = (int32_t)freadReverse32(fImages);
+    freadReverse32(fImages);
+    freadReverse32(fImages);
 
     // parse uint8_t (0...255) to float (0...1)
     
@@ -122,22 +122,30 @@ void parseMNISTImages(SW_MNISTData_t *data, const char *fileName)
         abort();
     }
 
-    // convert data
-    // pretty slow because of the frequent read/writes but that's not really a problem since
-    // it's a preprocessing step
-    uint32_t trainingImagesRead = 0;
-    for (uint32_t l = data->nImages*MNISTIMAGESIZE*MNISTIMAGESIZE; trainingImagesRead < l; trainingImagesRead++)
+    // convert uint8_t (0...255) data to float (0...1)
+
+    // copy data into array of different type (uint8_t -> float)
+    fread((uint8_t*)data->images, sizeof(uint8_t), data->nImages * MNISTIMAGESIZE * MNISTIMAGESIZE, fImages);
+
+    // convert the raw uint8_t data to float data
+
+    // set the data pointer to the last pixel in the uint8_t data stored in the float array
+    uint8_t *dataPointer = (uint8_t*)(data->images) + (sizeof(uint8_t) * (data->nImages*MNISTIMAGESIZE*MNISTIMAGESIZE - 1));
+
+    uint32_t nPixelsRead = 0;
+
+    // loop through the data backwards and put the corresponding normalized value at the correct place in the float array
+    for (uint32_t i = data->nImages*MNISTIMAGESIZE*MNISTIMAGESIZE-1; i > 0; i--, nPixelsRead++)
     {
-        uint8_t pixelData;
-        fread(&pixelData, sizeof(uint8_t), 1, fTrainingImages);
-        data->images[trainingImagesRead] = (float)pixelData / 255.0f;
+        data->images[i] = (float)(*dataPointer) / 255.0f;
+        dataPointer -= sizeof(uint8_t);
     }
 
 #ifdef DEBUG
-    printf("read %zu pixels into trainingImages\n", trainingImagesRead);
+    printf("read %u pixels into trainingImages\n", nPixelsRead);
 #endif
 
-    fclose(fTrainingImages);
+    fclose(fImages);
 }
 
 void SW_unloadMNIST(SW_MNISTData_t *data)
@@ -159,7 +167,7 @@ void SW_parseMNIST(SW_MNISTData_t *trainingData, SW_MNISTData_t *testData)
 SWM_Matrix SW_MNISTImageToMatrix(float *imagePointer)
 {
     SWM_Matrix out;
-    SWM_initMatrix(&out, 1, MNISTIMAGESIZE*MNISTIMAGESIZE);
+    SWM_init(&out, 1, MNISTIMAGESIZE*MNISTIMAGESIZE);
     memcpy(out.data, imagePointer, sizeof(float) * MNISTIMAGESIZE * MNISTIMAGESIZE);
     return out;
 }

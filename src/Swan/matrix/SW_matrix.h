@@ -45,14 +45,14 @@ static inline SWM_MatrixData_t SWM_createData(uint32_t rows, uint32_t columns)
     else { return data; }
 }
 
-static inline void SWM_initMatrix(SWM_Matrix *matrix, uint32_t rows, uint32_t columns)
+static inline void SWM_init(SWM_Matrix *matrix, uint32_t rows, uint32_t columns)
 {
     matrix->rows = rows;
     matrix->columns = columns;
     matrix->data = SWM_createData(rows, columns);
 }
 
-static inline void SWM_initMatrixData(SWM_Matrix *matrix, uint32_t rows, uint32_t columns, SWM_MatrixData_t data)
+static inline void SWM_initData(SWM_Matrix *matrix, uint32_t rows, uint32_t columns, SWM_MatrixData_t data)
 {
     matrix->rows = rows;
     matrix->columns = columns;
@@ -80,7 +80,7 @@ void SWM_transposeD(SWM_Matrix *a, SWM_Matrix *dest);
 static inline SWM_Matrix SWM_addMatrix(SWM_Matrix *a, SWM_Matrix *b)
 {
     SWM_Matrix out;
-    SWM_initMatrix(&out, a->rows, a->columns);
+    SWM_init(&out, a->rows, a->columns);
     SWM_addMatrixD(a, b, &out);
     return out;
 }
@@ -88,7 +88,7 @@ static inline SWM_Matrix SWM_addMatrix(SWM_Matrix *a, SWM_Matrix *b)
 static inline SWM_Matrix SWM_multiplyMatrix(SWM_Matrix *a, SWM_Matrix *b)
 {
     SWM_Matrix out;
-    SWM_initMatrix(&out, a->rows, b->columns);
+    SWM_init(&out, a->rows, b->columns);
     SWM_multiplyMatrixD(a, b, &out);
     return out;
 }
@@ -96,7 +96,7 @@ static inline SWM_Matrix SWM_multiplyMatrix(SWM_Matrix *a, SWM_Matrix *b)
 static inline SWM_Matrix SWM_multiplyScalar(SWM_Matrix *a, float scalar)
 {
     SWM_Matrix out;
-    SWM_initMatrix(&out, a->rows, a->columns);
+    SWM_init(&out, a->rows, a->columns);
     SWM_multiplyScalarD(a, scalar, &out);
     return out;
 }
@@ -104,7 +104,7 @@ static inline SWM_Matrix SWM_multiplyScalar(SWM_Matrix *a, float scalar)
 static inline SWM_Matrix SWM_transpose(SWM_Matrix *a)
 {
     SWM_Matrix out;
-    SWM_initMatrix(&out, a->columns, a->rows);
+    SWM_init(&out, a->columns, a->rows);
     SWM_transposeD(a, &out);
     return out;
 }

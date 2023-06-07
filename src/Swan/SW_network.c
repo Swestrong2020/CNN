@@ -18,12 +18,6 @@ void SW_InitNetwork(SW_Network *network, uint32_t inputNeurons)
     network->inputNeurons = inputNeurons;
 }
 
-// void SW_InitNetwork(SW_Network *network)
-// {
-//     network->layers = malloc(0);
-//     network->layerAmount = 0;
-// }
-
 void SW_AddNetworkLayer(SW_Network *network, uint32_t neuronAmount, SW_ActivationFunction activationFunction)
 {
     if (neuronAmount == 0)
@@ -48,66 +42,12 @@ void SW_AddNetworkLayer(SW_Network *network, uint32_t neuronAmount, SW_Activatio
     // create a new matrix with neuronAmount rows, where each column holds weights for 
     // every neuron in the previous layer
 
-    SWM_initMatrix(&currentLayer->weights, previouslayerNeurons, neuronAmount);
-    SWM_initMatrix(&currentLayer->biases, 1, neuronAmount);
+    SWM_init(&currentLayer->weights, previouslayerNeurons, neuronAmount);
+    SWM_init(&currentLayer->biases, 1, neuronAmount);
 
     SWM_fillMatrix(&currentLayer->weights, .0f);
     SWM_fillMatrix(&currentLayer->biases, .0f);
 }
-
-// void SW_AddNetworkLayer(SW_Network *network, uint32_t neuronAmount, SW_ActivationFunction activationFunction)
-// {
-    // if (neuronAmount == 0)
-    // {
-    //     fputs("WHAT'S THE POINT OF A NEURAL NETWORK IF IT LITERALLY HAS NO BRAIN? IS IT INSPIRED BY YOURSELF?", stderr);
-    //     return;
-    // }
-
-//     // Actually allocate the layer and its data
-//     network->layers = realloc(network->layers, (network->layerAmount + 1) * sizeof(SW_Layer));
-//     if (network->layers == NULL)
-//     {
-//         fputs("OH GOD OH CRAP EVERYTHING IS GOING WRONG", stderr);
-//         abort();
-//     }
-
-//     network->layerAmount++;
-
-//     SW_Layer *CurrentLayer = &network->layers[network->layerAmount - 1];
-
-//     CurrentLayer->neurons = malloc(sizeof(SW_Neuron) * neuronAmount);
-//     CurrentLayer->neuronAmount = neuronAmount;
-
-//     if (CurrentLayer->neurons == NULL)
-//     {
-//         fputs("Please get better RAM", stderr);
-//         abort();
-//     }
-
-//     CurrentLayer->activationFunction = activationFunction;
-
-//     // Allocate the weights and biases for the neuron (if there is a previous layer to have those values for)
-//     if (network->layerAmount > 1)
-//     {
-//         uint32_t PreviousLayerNeuronAmount = network->layers[network->layerAmount - 2].neuronAmount;
-
-//         for (uint32_t i = 0; i < neuronAmount; i++)
-//         {
-//             CurrentLayer->neurons[i].weights = malloc(sizeof(float) * PreviousLayerNeuronAmount);
-//             if (CurrentLayer->neurons[i].weights == NULL)
-//             {
-//                 fputs("Everything is going wrong again!", stderr);
-//                 abort();
-//             }
-
-//             memset(CurrentLayer->neurons[i].weights, 0, sizeof(float) * PreviousLayerNeuronAmount);
-
-//             CurrentLayer->neurons[i].bias = 0.0f;
-
-//             CurrentLayer->neurons[i].output = 0.0f;
-//         }
-//     }
-// }
 
 void SW_UnloadNetwork(SW_Network *network)
 {
@@ -119,22 +59,6 @@ void SW_UnloadNetwork(SW_Network *network)
     }
     free(network->layers);
 }
-
-// void SW_UnloadNetwork(SW_Network *network)
-// {
-//     for (uint32_t i = 0; i < network->layerAmount; i++)
-//     {
-//         if (i > 0)
-//         {
-//             for (uint32_t j = 0; j < network->layers[i].neuronAmount; j++)
-//                 free(network->layers[i].neurons[j].weights);
-//         }
-
-//         free(network->layers[i].neurons);
-//     }
-
-//     free(network->layers);
-// }
 
 void SW_RandomizeNetwork(SW_Network *network)
 {
@@ -171,7 +95,7 @@ void SW_ExecuteNetwork(SW_Network *network, SWM_Matrix *input, SWM_Matrix *dest)
     SW_Layer *currentLayer;
     SWM_Matrix currentOutput;
 
-    SWM_initMatrix(&currentOutput, input->rows, input->columns);
+    SWM_init(&currentOutput, input->rows, input->columns);
     memcpy(currentOutput.data, input->data, sizeof(SWM_MatrixValue_t) * input->rows * input->columns);
 
     for (int i = 0; i < network->layerAmount; i++)
@@ -214,9 +138,9 @@ void networkTrainingIteration(SW_Network *network, SWM_Matrix *input, uint8_t co
 void SW_TrainNetworkMNIST(SW_Network *network, SW_MNISTData_t *trainingData, uint32_t epochs, float learningRate, SW_LossFunction lossFunction)
 {
     SWM_Matrix networkOutputCache;
-    SWM_initMatrix(&networkOutputCache, 1, network->layers[network->layerAmount-1].weights.columns);
+    SWM_init(&networkOutputCache, 1, network->layers[network->layerAmount-1].weights.columns);
 
-
+    
 
 
 

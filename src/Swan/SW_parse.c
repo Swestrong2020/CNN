@@ -5,6 +5,7 @@
 
 #include "SW_parse.h"
 #include "SW_matrix.h"
+#include "SW_util.h"
 
 #define DEBUG
 
@@ -46,11 +47,11 @@ void SW_printMNISTImage(float *pointer)
 
             output[outIndex++] = lightValues[lightval];
 
-            if (outIndex >= buflen) { fputs("buffer overflow in image printing\n", stderr); abort(); }
+            if (outIndex >= buflen) { SW_FATAL("buffer overflow in image printing\n") }
         }
         output[outIndex++] = '\n';
 
-        if (outIndex >= buflen) { fputs("buffer overflow in image printing\n", stderr); abort(); }
+        if (outIndex >= buflen) { SW_FATAL("buffer overflow in image printing\n") }
     }
 
     output[outIndex] = '\0';
@@ -66,8 +67,7 @@ void parseMNISTLabels(SW_MNISTData_t *data, const char *fileName)
     // safety checks
     if (fLabels == NULL)
     {
-        fputs("error opening training label file\n", stderr);
-        abort();
+        SW_FATAL("error opening training label file\n")
     }
 
     int32_t trainingLabelsMagicBytes;
@@ -79,8 +79,7 @@ void parseMNISTLabels(SW_MNISTData_t *data, const char *fileName)
     
     if (data->labels == NULL)
     {
-        fputs("not enough memory :(\n", stderr);
-        abort();
+        SW_FATAL("not enough memory :(\n")
     }
     
     size_t trainingLabelsNRead = fread(data->labels, sizeof(uint8_t), data->nLabels, fLabels);
@@ -99,8 +98,7 @@ void parseMNISTImages(SW_MNISTData_t *data, const char *fileName)
 
     if (fImages == NULL)
     {
-        fputs("error opening training images file\n", stderr);
-        abort();
+        SW_FATAL("error opening training images file\n")
     }
 
     int32_t trainingImagesMagicBytes;
@@ -118,8 +116,7 @@ void parseMNISTImages(SW_MNISTData_t *data, const char *fileName)
     
     if (data->images == NULL)
     {
-        fputs("not enough memory :(\n", stderr);
-        abort();
+        SW_FATAL("not enough memory :(\n")
     }
 
     // convert uint8_t (0...255) data to float (0...1)

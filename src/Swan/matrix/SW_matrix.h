@@ -6,6 +6,8 @@
 #include <stdlib.h>
 #include <string.h>
 
+#define SWM_FATAL(_msg) { fputs(_msg, stderr); abort(); }
+
 /* SW_MatrixData_t data[row][column] */
 typedef float SWM_MatrixValue_t;
 typedef SWM_MatrixValue_t* SWM_MatrixData_t;
@@ -41,7 +43,7 @@ static inline void SWM_set(SWM_Matrix *matrix, uint32_t row, uint32_t column, SW
 static inline SWM_MatrixData_t SWM_createData(uint32_t rows, uint32_t columns)
 {
     SWM_MatrixData_t data = (SWM_MatrixData_t) malloc(sizeof(SWM_MatrixValue_t) * rows * columns);
-    if (data == NULL) { fputs("Error allocating matrix data\n", stderr); abort(); }
+    if (data == NULL) { SWM_FATAL("Error allocating matrix data\n") }
     else { return data; }
 }
 

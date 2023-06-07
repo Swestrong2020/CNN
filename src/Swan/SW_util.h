@@ -4,6 +4,9 @@
 #include <stdint.h>
 #include <math.h>
 #include <stdlib.h>
+#include <stdio.h>
+
+#define SW_FATAL(_msg) { fputs(_msg, stderr); abort(); }
 
 static inline float SW_Sigmoid(float input)
 {
@@ -62,6 +65,14 @@ static inline float SW_CrossEntropy(float *p, float *q, uint32_t nValues)
     for (uint32_t i = 0; i < nValues; i++)
         r += p[i] * log2(q[i]);
     return -r;
+}
+
+static inline float SW_MeanSquaredError(float *p, float *q, uint32_t nValues)
+{
+    float sum = 0;
+    for (uint32_t i = 0; i < nValues; i++)
+        sum += pow((p[i]-q[i]), 2);
+    return sum / nValues;
 }
 
 static inline float SW_randf(float min, float max)

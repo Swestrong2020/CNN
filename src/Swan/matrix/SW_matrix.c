@@ -11,16 +11,13 @@ void SWM_addMatrixD(SWM_Matrix *a, SWM_Matrix *b, SWM_Matrix *dest)
 {
     if (dest->rows != a->rows || dest->columns != a->columns)
     {
-        fputs("Destination matrix not of the right size\n", stderr);
-        abort();
+       SWM_FATAL("Destination matrix not of the right size\n")
     }
 
     // safety guards
     if (a->rows != b->rows || a->columns != b->columns)
     {
-        fputs("Failed to add differently sized matrices\n", stderr);
-
-        abort();
+        SWM_FATAL("Failed to add differently sized matrices\n")
     }
 
     for (uint32_t i = 0, l = dest->rows; i < l; i++)
@@ -32,14 +29,12 @@ void SWM_multiplyMatrixD(SWM_Matrix *a, SWM_Matrix *b, SWM_Matrix *dest)
 {
     if (dest->rows != a->rows || dest->columns != b->columns)
     {
-        fputs("Destination matrix not of the right size\n", stderr);
-        abort();
+        SWM_FATAL("Destination matrix not of the right size\n")
     }
 
     if (a->columns != b->rows)
     {
-        fputs("Error multiplying two matrices of different sizes\n", stderr);
-        abort();
+        SWM_FATAL("Error multiplying two matrices of different sizes\n")
     }
 
     // iterate and multiply
@@ -64,8 +59,7 @@ void SWM_transposeD(SWM_Matrix *a, SWM_Matrix *dest)
 {
     if (dest->columns != a->rows || dest->rows != a->columns)
     {
-        fputs("Error transposing, destination matrix wrong size\n", stderr);
-        abort();
+        SWM_FATAL("Error transposing, destination matrix wrong size\n")
     }
 
     for (uint32_t i = 0, li = a->columns; i < li; i++)
@@ -82,7 +76,7 @@ void SWM_printm(SWM_Matrix *matrix)
 {
     if (matrix->rows == 0 || matrix->columns == 0)
     {
-        fputs("Not printing empty matrix >:(\n", stderr);
+        SWM_FATAL("Not printing empty matrix >:(\n")
     }
     
     fprintf(stdout, "(%d, %d)\n", matrix->rows, matrix->columns);

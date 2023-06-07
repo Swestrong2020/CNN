@@ -35,11 +35,4 @@ typedef struct SW_Network
     uint32_t layerAmount;
 } SW_Network;
 
-/* expects input and correctOutput to contain dataAmount*network.inputNeurons and dataAmount*network.outputNeurons respectively */
-typedef struct SW_TrainingInput
-{
-    float *input, *correctOutput; /* compact arrays of input/output pairs*/
-    uint32_t dataAmount; /* how many input/output pairs are there */
-} SW_TrainingInput;
-
 #endif // SW_TYPES_H

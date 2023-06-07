@@ -22,8 +22,7 @@ void SW_AddNetworkLayer(SW_Network *network, uint32_t neuronAmount, SW_Activatio
 {
     if (neuronAmount == 0)
     {
-        fputs("WHAT'S THE POINT OF A NEURAL NETWORK IF IT LITERALLY HAS NO BRAIN? IS IT INSPIRED BY YOURSELF?", stderr);
-        abort();
+        SW_FATAL("WHAT'S THE POINT OF A NEURAL NETWORK IF IT LITERALLY HAS NO BRAIN? IS IT INSPIRED BY YOURSELF?\n")
     }
 
     uint32_t previouslayerNeurons = (network->layerAmount == 0) ? network->inputNeurons : network->layers[network->layerAmount-1].weights.columns;
@@ -31,8 +30,7 @@ void SW_AddNetworkLayer(SW_Network *network, uint32_t neuronAmount, SW_Activatio
     network->layers = realloc(network->layers, (++network->layerAmount) * sizeof(SW_Layer));
     if (network->layers == NULL)
     {
-        fputs("Oopsie during layer allocation :(\n", stderr);
-        abort();
+        SW_FATAL("Oopsie during layer allocation :(\n")
     }
 
     SW_Layer *currentLayer = &network->layers[network->layerAmount-1];
@@ -82,14 +80,12 @@ void SW_ExecuteNetwork(SW_Network *network, SWM_Matrix *input, SWM_Matrix *dest)
 {
     if (network->layerAmount == 0)
     {
-        fputs("Not executing empty network\n", stderr);
-        abort();
+        SW_FATAL("Not executing empty network\n")
     }
 
     if (dest->rows != 1 || dest->columns != network->layers[network->layerAmount-1].weights.columns)
     {
-        fputs("destination matrix should be of size (1, output neuron amount) where (row, column)\n", stderr);
-        abort();
+        SW_FATAL("destination matrix should be of size (1, output neuron amount) where (row, column)\n")
     }
 
     SW_Layer *currentLayer;
@@ -129,20 +125,49 @@ void SW_ExecuteNetwork(SW_Network *network, SWM_Matrix *input, SWM_Matrix *dest)
     SWM_destroyMatrix(&currentOutput);
 }
 
-/* training iteration over single input/output pair */
-void networkTrainingIteration(SW_Network *network, SWM_Matrix *input, uint8_t correctOutput, SWM_Matrix *outputCache, SW_LossFunction lossFunction)
-{
-    SW_ExecuteNetwork(network, input, outputCache);
-}
-
-void SW_TrainNetwork(SW_Network *network, SW_TrainingInput *trainingData, uint32_t epochs, float learningRate, SW_LossFunction lossFunction, uint32_t batchSize)
+void SW_TrainNetwork(SW_Network *network, SW_MNISTData_t *trainingData, uint32_t epochs, float learningRate, SW_LossFunction lossFunction, uint32_t batchSize)
 {
     /* initialize output cache with size (1, network.outputNeurons) */
     SWM_Matrix networkOutputCache, networkInputCache;
     SWM_init(&networkOutputCache, 1, network->layers[network->layerAmount-1].weights.columns);
     SWM_init(&networkInputCache, 1, network->inputNeurons);
 
-    
+    networkInputCache.data = trainingData->images;
+
+    {
+        uint8_t correctOutput = trainingData->labels[0];
+
+        SW_ExecuteNetwork(network, &networkInputCache, &networkOutputCache);
+
+        uint32_t nValues = network->layers[network->layerAmount-1].weights.columns;
+
+        // calculate loss
+        float ca[nValues];
+
+        for (uint32_t i = 0; i < nValues; i++)
+            ca[i] = 0;
+        ca[correctOutput] = 1;
+        
+        // since outputCache->data is a row vector with one row, it can be treated as a float array
+        // because matrices are stored row-wise
+        float loss;
+
+        switch (lossFunction)
+        {
+            case SW_LOSS_FUNCTION_MEAN_SQUARED_ERROR:
+                loss = SW_MeanSquaredError(networkOutputCache.data, ca, nValues);
+                break;
+            case SW_LOSS_FUNCTION_CROSS_ENTROPY:
+                loss = SW_CrossEntropy(networkOutputCache.data, ca, nValues);
+                break;
+            default:
+                SW_FATAL("not a cost function\n")
+                break;
+        }
+
+        printf("%f\n", loss);
+    }
+
 
     SWM_destroyMatrix(&networkOutputCache);
 }

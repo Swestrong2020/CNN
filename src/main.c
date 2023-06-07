@@ -35,19 +35,8 @@ int main(void)
     printf("first image of test set (should be %u):\n", testData.labels[0]);
     SW_printMNISTImage(testData.images);
 
-    // // temp first image of training set
-    // SWM_Matrix inputMatrix = SW_MNISTImageToMatrix(trainingData.images);
 
-    // SWM_Matrix outputMatrix;
-    // SWM_init(&outputMatrix, 1, network.layers[network.layerAmount-1].weights.columns);
-    // SW_ExecuteNetwork(&network, &inputMatrix, &outputMatrix);
-
-    // printf("test network output (with first image of training set):\n");
-    // SWM_printm(&outputMatrix);
-
-    // SWM_destroyMatrix(&inputMatrix);
-    // SWM_destroyMatrix(&outputMatrix);
-
+    SW_TrainNetwork(&network, &trainingData, 1, 1, SW_LOSS_FUNCTION_MEAN_SQUARED_ERROR, 1);
 
 
     SW_UnloadNetwork(&network);

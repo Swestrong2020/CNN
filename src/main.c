@@ -35,9 +35,7 @@ int main(void)
     printf("first image of test set (should be %u):\n", testData.labels[0]);
     SW_printMNISTImage(testData.images);
 
-
     SW_TrainNetwork(&network, &trainingData, 1, 1, SW_LOSS_FUNCTION_MEAN_SQUARED_ERROR, 1);
-
 
     SW_UnloadNetwork(&network);
 

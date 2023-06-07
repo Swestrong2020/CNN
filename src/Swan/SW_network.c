@@ -129,20 +129,20 @@ void SW_ExecuteNetwork(SW_Network *network, SWM_Matrix *input, SWM_Matrix *dest)
     SWM_destroyMatrix(&currentOutput);
 }
 
-/* alters neural network weights and biases*/
+/* training iteration over single input/output pair */
 void networkTrainingIteration(SW_Network *network, SWM_Matrix *input, uint8_t correctOutput, SWM_Matrix *outputCache, SW_LossFunction lossFunction)
 {
     SW_ExecuteNetwork(network, input, outputCache);
 }
 
-void SW_TrainNetworkMNIST(SW_Network *network, SW_MNISTData_t *trainingData, uint32_t epochs, float learningRate, SW_LossFunction lossFunction)
+void SW_TrainNetwork(SW_Network *network, SW_TrainingInput *trainingData, uint32_t epochs, float learningRate, SW_LossFunction lossFunction, uint32_t batchSize)
 {
-    SWM_Matrix networkOutputCache;
+    /* initialize output cache with size (1, network.outputNeurons) */
+    SWM_Matrix networkOutputCache, networkInputCache;
     SWM_init(&networkOutputCache, 1, network->layers[network->layerAmount-1].weights.columns);
+    SWM_init(&networkInputCache, 1, network->inputNeurons);
 
     
-
-
 
     SWM_destroyMatrix(&networkOutputCache);
 }

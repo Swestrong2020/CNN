@@ -132,44 +132,54 @@ void SW_TrainNetwork(SW_Network *network, SW_MNISTData_t *trainingData, uint32_t
     SWM_init(&networkOutputCache, 1, network->layers[network->layerAmount-1].weights.columns);
     SWM_init(&networkInputCache, 1, network->inputNeurons);
 
+    // initialize the network input with the first image of the training set
+    // temporary for testing
     networkInputCache.data = trainingData->images;
 
+
+    // loss should be calculated for entire batch, currently calculated for single image
+
+    uint8_t correctOutput = trainingData->labels[0];
+
+    SW_ExecuteNetwork(network, &networkInputCache, &networkOutputCache);
+
+    uint32_t nValues = network->layers[network->layerAmount-1].weights.columns;
+
+    // calculate loss
+    float ca[nValues];
+
+    for (uint32_t i = 0; i < nValues; i++)
+        ca[i] = 0;
+    ca[correctOutput] = 1;
+    
+    // since outputCache->data is a row vector with one row, it can be treated as a float array
+    // because matrices are stored row-wise
+    float loss;
+
+    switch (lossFunction)
     {
-        uint8_t correctOutput = trainingData->labels[0];
+        case SW_LOSS_FUNCTION_MEAN_SQUARED_ERROR:
+            loss = SW_MeanSquaredError(networkOutputCache.data, ca, nValues);
+            break;
+        case SW_LOSS_FUNCTION_CROSS_ENTROPY:
+            loss = SW_CrossEntropy(networkOutputCache.data, ca, nValues);
+            break;
+        default:
+            SW_FATAL("not a cost function\n")
+            break;
+    }
 
-        SW_ExecuteNetwork(network, &networkInputCache, &networkOutputCache);
-
-        uint32_t nValues = network->layers[network->layerAmount-1].weights.columns;
-
-        // calculate loss
-        float ca[nValues];
-
-        for (uint32_t i = 0; i < nValues; i++)
-            ca[i] = 0;
-        ca[correctOutput] = 1;
+    // move backwards through the layers
+    for (uint32_t iLayer = network->layerAmount-1; i >= 0; i--)
+    {
         
-        // since outputCache->data is a row vector with one row, it can be treated as a float array
-        // because matrices are stored row-wise
-        float loss;
-
-        switch (lossFunction)
-        {
-            case SW_LOSS_FUNCTION_MEAN_SQUARED_ERROR:
-                loss = SW_MeanSquaredError(networkOutputCache.data, ca, nValues);
-                break;
-            case SW_LOSS_FUNCTION_CROSS_ENTROPY:
-                loss = SW_CrossEntropy(networkOutputCache.data, ca, nValues);
-                break;
-            default:
-                SW_FATAL("not a cost function\n")
-                break;
-        }
-
-        printf("%f\n", loss);
     }
 
 
+
+
     SWM_destroyMatrix(&networkOutputCache);
+    SWM_destroyMatrix(&networkInputCache);
 }
 
 // float SW_CalculateLoss(SW_Network *network, SW_LossFunction lossFunction, float *input, float *correctOutput)

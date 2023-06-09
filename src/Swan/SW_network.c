@@ -134,7 +134,7 @@ void SW_TrainNetwork(SW_Network *network, SW_MNISTData_t *trainingData, uint32_t
 
     // initialize the network input with the first image of the training set
     // temporary for testing
-    networkInputCache.data = trainingData->images;
+    memcpy(networkInputCache.data, trainingData->images, sizeof(float) * MNISTIMAGESIZE*MNISTIMAGESIZE);
 
 
     // loss should be calculated for entire batch, currently calculated for single image
@@ -170,7 +170,7 @@ void SW_TrainNetwork(SW_Network *network, SW_MNISTData_t *trainingData, uint32_t
     }
 
     // move backwards through the layers
-    for (uint32_t iLayer = network->layerAmount-1; i >= 0; i--)
+    for (uint32_t iLayer = network->layerAmount-1; iLayer >= 0; iLayer--)
     {
         
     }

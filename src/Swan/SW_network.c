@@ -11,6 +11,44 @@
 #include "SW_matrix.h"
 #include "SW_parse.h"
 
+typedef struct SingleGradient
+{
+
+    SWM_Matrix weightGradient;
+    SWM_Matrix biasGradient;
+
+} SingleGradient;
+
+typedef SingleGradient* NetworkGradients;
+
+void initGradients(SW_Network *network, NetworkGradients *destGradient)
+{
+    (*destGradient) = malloc(sizeof(SingleGradient) * network->layerAmount);
+
+    if ((*destGradient) == NULL)
+    {
+        fputs("error allocating network gradients\n", stderr);
+        abort();
+    }
+
+    // initialize all matrices to store the gradients
+    for (uint32_t i = 0; i < network->layerAmount; i++)
+    {
+        SWM_init(&destGradient[i]->biasGradient, network->layers[i].weights.rows, network->layers[i].weights.columns);
+        SWM_init(&destGradient[i]->weightGradient, network->layers[i].biases.rows, network->layers[i].biases.columns);
+    }
+}
+
+/* also pass the network because gradient size depends on network size*/
+void destroyGradients(SW_Network *network, NetworkGradients *gradient)
+{
+    for (uint32_t i = 0; i < network->layerAmount; i++)
+    {
+        SWM_destroyMatrix(&gradient[i]->biasGradient);
+        SWM_destroyMatrix(&gradient[i]->weightGradient);
+    }
+}
+
 void SW_InitNetwork(SW_Network *network, uint32_t inputNeurons)
 {
     network->layers = malloc(0);
@@ -76,6 +114,25 @@ void SW_RandomizeNetwork(SW_Network *network)
     }
 }
 
+void applyActivation(SWM_Matrix *values, SW_ActivationFunction activationFunction)
+{
+    // apply activation function
+    switch (activationFunction)
+    {
+        case SW_ACTIVATION_FUNCTION_RELU:
+            SWM_applyFunction(values, &SW_ReLu);
+            break;
+        case SW_ACTIVATION_FUNCTION_SIGMOID:
+            SWM_applyFunction(values, &SW_Sigmoid);
+            break;
+        case SW_ACTIVATION_FUNCTION_TANH:
+            SWM_applyFunction(values, &SW_Tanh);
+            break;
+        case SW_ACTIVATION_FUNCTION_SOFTMAX:
+            break;
+    }
+}
+
 void SW_ExecuteNetwork(SW_Network *network, SWM_Matrix *input, SWM_Matrix *dest)
 {
     if (network->layerAmount == 0)
@@ -88,12 +145,17 @@ void SW_ExecuteNetwork(SW_Network *network, SWM_Matrix *input, SWM_Matrix *dest)
         SW_FATAL("destination matrix should be of size (1, output neuron amount) where (row, column)\n")
     }
 
+    // variables for storing the current values
     SW_Layer *currentLayer;
     SWM_Matrix currentOutput;
 
+    // initialize the output with the size of the input
     SWM_init(&currentOutput, input->rows, input->columns);
+    // copy the input data into the current output array
     memcpy(currentOutput.data, input->data, sizeof(SWM_MatrixValue_t) * input->rows * input->columns);
 
+    // loop through every layer from left to right, multiply current output with the
+    // weights, add bias and apply activation function
     for (int i = 0; i < network->layerAmount; i++)
     {
         currentLayer = &network->layers[i];
@@ -101,85 +163,123 @@ void SW_ExecuteNetwork(SW_Network *network, SWM_Matrix *input, SWM_Matrix *dest)
         SWM_Matrix tempOut = SWM_multiplyMatrix(&currentOutput, &currentLayer->weights);
         SWM_addMatrixD(&tempOut, &currentLayer->biases, &tempOut);
 
-        // apply activation function
-        switch (currentLayer->activationFunction)
-        {
-            case SW_ACTIVATION_FUNCTION_RELU:
-                SWM_applyFunction(&tempOut, &SW_ReLu);
-                break;
-            case SW_ACTIVATION_FUNCTION_SIGMOID:
-                SWM_applyFunction(&tempOut, &SW_Sigmoid);
-                break;
-            case SW_ACTIVATION_FUNCTION_TANH:
-                SWM_applyFunction(&tempOut, &SW_Tanh);
-                break;
-            case SW_ACTIVATION_FUNCTION_SOFTMAX:
-                break;
-        }
+        applyActivation(&tempOut, currentLayer->activationFunction);
 
-        SWM_destroyMatrix(&currentOutput);
+        // kinda jank, store the tempOut variable in the current output
+        // have to free the previously allocated memory because the tempOut
+        // might be of a different size than the current output matrix
+        SWM_destroyMatrix(&currentOutput);  
         currentOutput = tempOut;
     }
 
+    // return the current data
     memcpy(dest->data, currentOutput.data, sizeof(float) * currentOutput.rows * currentOutput.columns);
     SWM_destroyMatrix(&currentOutput);
 }
 
+/* calculates the gradient of the network with a single input/output pair */
+void calculateGradient(SW_Network *network, SW_MNISTData_t *trainingData, SW_LossFunction lossFunction, uint32_t iInput /* the location of the input to use in the training data */, NetworkGradients *destGradient)
+{
+    // stochastic gradient descent implementation
+
+    // offset the input pointer to the correct input image
+    float *inputs = trainingData->images + (sizeof(float) * iInput * MNISTIMAGESIZE*MNISTIMAGESIZE);
+
+    /* DON'T FREE THIS VARIABLE, it didn't allocate new memory, just points to existing memory */
+    SWM_Matrix networkInputs;
+    SWM_initData(&networkInputs, 1, MNISTIMAGESIZE*MNISTIMAGESIZE, inputs);
+
+    // offset the output to point to the correct output label
+    uint8_t correctOutputNumber = (*trainingData->labels + (sizeof(uint8_t) * iInput));
+    
+    uint32_t nOutputNeurons = network->layers[network->layerAmount-1].weights.columns;
+
+    // convert correct output to a format that can be used by the loss function
+    // specific to the mnist data set right now
+    float correctOutput[nOutputNeurons];
+    for (uint32_t i = 0; i < nOutputNeurons; i++)
+        correctOutput[i] = 0;
+    correctOutput[correctOutputNumber] = 1;
+
+    // forward propagation while caching necessary values at every step
+    SWM_Matrix 
+        outputs[network->layerAmount],
+        activations[network->layerAmount];
+
+    SWM_Matrix *currentInput = &networkInputs;
+
+    for (uint32_t i = 0; i < network->layerAmount; i++)
+    {
+        SW_Layer *cl = &network->layers[i];
+
+        SWM_init(&outputs[i], 1, cl->weights.columns);
+        SWM_init(&activations[i], 1, cl->weights.columns);
+
+        // store the weighted input in outputs
+        SWM_multiplyMatrixD(currentInput, &cl->weights, &outputs[i]);
+        SWM_addMatrixD(&outputs[i], &cl->biases, &outputs[i]);
+
+        // store activations in... activations
+        memcpy(&activations[i].data, &outputs[i].data, sizeof(float) * outputs[i].rows * outputs[i].columns);
+        applyActivation(&activations[i], cl->activationFunction);
+    }
+
+
+
+
+
+    // free cached values
+    for (uint32_t i = 0; i < network->layerAmount; i++)
+    {
+        SWM_destroyMatrix(&outputs[i]);
+        SWM_destroyMatrix(&activations[i]);
+    }
+}
+
 void SW_TrainNetwork(SW_Network *network, SW_MNISTData_t *trainingData, uint32_t epochs, float learningRate, SW_LossFunction lossFunction, uint32_t batchSize)
 {
-    /* initialize output cache with size (1, network.outputNeurons) */
-    SWM_Matrix networkOutputCache, networkInputCache;
-    SWM_init(&networkOutputCache, 1, network->layers[network->layerAmount-1].weights.columns);
-    SWM_init(&networkInputCache, 1, network->inputNeurons);
-
-    // initialize the network input with the first image of the training set
-    // temporary for testing
-    networkInputCache.data = trainingData->images;
-
-
     // loss should be calculated for entire batch, currently calculated for single image
 
-    uint8_t correctOutput = trainingData->labels[0];
+    uint32_t currentInput = 0;
 
-    SW_ExecuteNetwork(network, &networkInputCache, &networkOutputCache);
-
-    uint32_t nValues = network->layers[network->layerAmount-1].weights.columns;
-
-    // calculate loss
-    float ca[nValues];
-
-    for (uint32_t i = 0; i < nValues; i++)
-        ca[i] = 0;
-    ca[correctOutput] = 1;
-    
-    // since outputCache->data is a row vector with one row, it can be treated as a float array
-    // because matrices are stored row-wise
-    float loss;
-
-    switch (lossFunction)
-    {
-        case SW_LOSS_FUNCTION_MEAN_SQUARED_ERROR:
-            loss = SW_MeanSquaredError(networkOutputCache.data, ca, nValues);
-            break;
-        case SW_LOSS_FUNCTION_CROSS_ENTROPY:
-            loss = SW_CrossEntropy(networkOutputCache.data, ca, nValues);
-            break;
-        default:
-            SW_FATAL("not a cost function\n")
-            break;
-    }
-
-    // move backwards through the layers
-    for (uint32_t iLayer = network->layerAmount-1; i >= 0; i--)
-    {
-        
-    }
+    NetworkGradients gradient;
+    initGradients(network, &gradient);
 
 
+    calculateGradient(network, trainingData, lossFunction, currentInput, &gradient);
 
 
-    SWM_destroyMatrix(&networkOutputCache);
-    SWM_destroyMatrix(&networkInputCache);
+    destroyGradients(network, &gradient);
+
+    // // amount of output neurons
+    // uint32_t nValues = network->layers[network->layerAmount-1].weights.columns;
+
+    // // since outputCache->data is a row vector with one row, it can be treated as a float array
+    // // because matrices are stored row-wise, so one can directly give the float pointer as an
+    // // argument to the loss functions that operate on float arrays as opposed to matrices
+    // float loss;
+
+    // switch (lossFunction)
+    // {
+    //     case SW_LOSS_FUNCTION_MEAN_SQUARED_ERROR:
+    //         loss = SW_MeanSquaredError(networkOutputCache.data, ca, nValues);
+    //         break;
+    //     case SW_LOSS_FUNCTION_CROSS_ENTROPY:
+    //         loss = SW_CrossEntropy(networkOutputCache.data, ca, nValues);
+    //         break;
+    //     default:
+    //         SW_FATAL("not a cost function\n")
+    //         break;
+    // }
+
+    // // got this from wikipedia, shit still leave me guessin' but getting there :/
+
+    // // move backwards through the layers
+    // for (uint32_t iLayer = network->layerAmount-1; iLayer >= 0; iLayer--)
+    // {
+         
+    // }
+
 }
 
 // float SW_CalculateLoss(SW_Network *network, SW_LossFunction lossFunction, float *input, float *correctOutput)

@@ -12,6 +12,7 @@ void SW_AddNetworkLayer(SW_Network *network, uint32_t neuronAmount, SW_Activatio
 void SW_UnloadNetwork(SW_Network *network);
 void SW_RandomizeNetwork(SW_Network *network);
 
+/* expects the destination matrix to be already initialized */
 void SW_ExecuteNetwork(SW_Network *network, SWM_Matrix *input, SWM_Matrix *dest);
 void SW_TrainNetwork(SW_Network *network, SW_MNISTData_t *trainingData, uint32_t epochs, float learningRate, SW_LossFunction lossFunction, uint32_t batchSize);
 

@@ -34,8 +34,8 @@ void initGradients(SW_Network *network, NetworkGradients *destGradient)
     // initialize all matrices to store the gradients
     for (uint32_t i = 0; i < network->layerAmount; i++)
     {
-        SWM_init(&destGradient[i]->biasGradient, network->layers[i].weights.rows, network->layers[i].weights.columns);
-        SWM_init(&destGradient[i]->weightGradient, network->layers[i].biases.rows, network->layers[i].biases.columns);
+        SWM_init(&(*destGradient)[i].biasGradient, network->layers[i].weights.rows, network->layers[i].weights.columns);
+        SWM_init(&(*destGradient)[i].weightGradient, network->layers[i].biases.rows, network->layers[i].biases.columns);
     }
 }
 
@@ -202,7 +202,7 @@ void calculateGradient(SW_Network *network, SW_MNISTData_t *trainingData, SW_Los
     correctOutput[correctOutputNumber] = 1;
 
     // forward propagation while caching necessary values at every step
-    SWM_Matrix 
+    SWM_Matrix
         outputs[network->layerAmount],
         activations[network->layerAmount];
 
@@ -220,8 +220,13 @@ void calculateGradient(SW_Network *network, SW_MNISTData_t *trainingData, SW_Los
         SWM_addMatrixD(&outputs[i], &cl->biases, &outputs[i]);
 
         // store activations in... activations
+        // why the fuck does this uninitialize outputs[i] I'm going crazy tf
         memcpy(&activations[i].data, &outputs[i].data, sizeof(float) * outputs[i].rows * outputs[i].columns);
+
+
         applyActivation(&activations[i], cl->activationFunction);
+    
+        currentInput = &outputs[i];
     }
 
 
